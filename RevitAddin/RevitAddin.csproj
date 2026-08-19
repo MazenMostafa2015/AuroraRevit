@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2025</RevitVersion>
+    <TargetFramework Condition="'$(RevitVersion)' == '2025'">net8.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(RevitVersion)' != '2025'">net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <RootNamespace>AuroraRevit.RevitAddin</RootNamespace>
+    <AssemblyName>AuroraRevit.RevitAddin</AssemblyName>
+    <Platforms>AnyCPU</Platforms>
+    <OutputPath Condition="'$(Configuration)' == 'Release'">$(MSBuildThisFileDirectory)..\Release\RevitAddin\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+
+    <PackageReference Include="System.Text.Json" Version="8.0.18" />
+
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI"
+                      Version="2023.1.90"
+                      Condition="'$(RevitVersion)' == '2023'"
+                      PrivateAssets="all" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI"
+                      Version="2023.1.90"
+                      Condition="'$(RevitVersion)' == '2023'"
+                      PrivateAssets="all" />
+
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI"
+                      Version="2024.3.60"
+                      Condition="'$(RevitVersion)' == '2024'"
+                      PrivateAssets="all" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI"
+                      Version="2024.3.60"
+                      Condition="'$(RevitVersion)' == '2024'"
+                      PrivateAssets="all" />
+
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI"
+                      Version="2025.4.60"
+                      Condition="'$(RevitVersion)' == '2025'"
+                      PrivateAssets="all" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI"
+                      Version="2025.4.60"
+                      Condition="'$(RevitVersion)' == '2025'"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="AuroraRevit.addin" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Examples\**\examples.json" />
+  </ItemGroup>
+</Project>

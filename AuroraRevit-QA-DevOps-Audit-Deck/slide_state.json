@@ -1,0 +1,100 @@
+{
+  "project_info": {
+    "title": "AuroraRevit QA & DevOps Audit",
+    "created": 1787160163.523,
+    "last_updated": 1787160473.609,
+    "total_slides": 8
+  },
+  "slides": [
+    {
+      "id": "audit_outcome",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "system_boundaries",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "proxy_operations",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "revit_safety",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "runtime_hardening",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "ci_pipeline",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "embedded_examples",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "next_gate",
+      "state": "edited",
+      "pageNum": 8
+    }
+  ],
+  "outline": [
+    {
+      "id": "audit_outcome",
+      "title": "AuroraRevit QA & DevOps Audit",
+      "summary": "Summarize the audit outcome: static QA passed, Windows CI configured, and local compilation blocked only by missing sandbox tooling.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "system_boundaries",
+      "title": "One Solution, Four Operational Boundaries",
+      "summary": "Show the Revit WPF panel, SSE/JSON proxy boundary, OpenAI service, proxy GUI host, and embedded examples as one architecture.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "proxy_operations",
+      "title": "The Proxy Is Operable, Observable, and Resilient",
+      "summary": "Present the WPF proxy GUI, health polling, start/stop controls, logs, self-contained publishing, and port 5000-to-5001 fallback.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "revit_safety",
+      "title": "Faster Review Without Unsafe Automation",
+      "summary": "Explain the Copy this Execution button, syntax-highlighted code review, ExternalEvent/Transaction execution, and explicit approval boundary.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "runtime_hardening",
+      "title": "Invalid Inputs and Provider Failures Become Controlled States",
+      "summary": "Summarize prompt validation, credential validation, safe errors, and bounded input handling.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "ci_pipeline",
+      "title": "Reproducible Windows Builds for Three Revit Versions",
+      "summary": "Visualize the GitHub Actions pipeline from trigger through Windows matrix build, publish, manifest generation, and artifact upload.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "embedded_examples",
+      "title": "40 Examples Remain Inside the Add-in Assembly",
+      "summary": "Show the four discipline libraries, embedded-resource validation, and net48/net8 compatibility matrix.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "next_gate",
+      "title": "Self-Audit Converted Risks Into Explicit Controls",
+      "summary": "List key fixes and define the next gate: authoritative GitHub Actions build and Windows/Revit smoke testing.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

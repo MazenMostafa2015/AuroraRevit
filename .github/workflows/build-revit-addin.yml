@@ -1,0 +1,79 @@
+name: Build AuroraRevit Add-in
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Revit ${{ matrix.revit-version }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        revit-version: ["2023", "2024", "2025"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 for AiProxy
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore solution
+        run: dotnet restore AuroraRevit.sln -p:RevitVersion=${{ matrix.revit-version }}
+
+      - name: Build solution in Release mode
+        run: dotnet build AuroraRevit.sln --configuration Release --no-restore -p:RevitVersion=${{ matrix.revit-version }}
+
+      - name: Publish AiProxy self-contained for win-x64
+        run: >-
+          dotnet publish AiProxy/AiProxy.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          --no-restore
+          --output publish/AiProxy
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:PublishTrimmed=false
+
+      - name: Publish AiProxy GUI self-contained for win-x64
+        run: >-
+          dotnet publish AiProxy.Desktop/AiProxy.Desktop.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          --no-restore
+          --output publish/AiProxyGui
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:PublishTrimmed=false
+
+      - name: Generate matching Revit manifest
+        shell: pwsh
+        run: >-
+          ./RevitAddin/Generate-RevitManifests.ps1
+          -AssemblyPath "$env:GITHUB_WORKSPACE/Release/RevitAddin/AuroraRevit.RevitAddin.dll"
+          -OutputRoot "$env:GITHUB_WORKSPACE/publish/Manifests"
+          -Versions "${{ matrix.revit-version }}"
+
+      - name: Upload Revit add-in and AiProxy artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-revit-release-${{ matrix.revit-version }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            Release/RevitAddin/AuroraRevit.RevitAddin.dll
+            Release/RevitAddin/AuroraRevit.addin
+            publish/Manifests/Revit${{ matrix.revit-version }}/AuroraRevit.addin
+            publish/AiProxy/**
+            publish/AiProxyGui/**

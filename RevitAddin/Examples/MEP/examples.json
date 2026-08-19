@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Place a Rectangular Duct",
+    "prompt": "Place a standard rectangular duct from point A to point B."
+  },
+  {
+    "title": "Size a Pipe from Fixture Units",
+    "prompt": "Size the selected pipe based on the connected fixture units."
+  },
+  {
+    "title": "Create a Ceiling Lighting Fixture",
+    "prompt": "Create a new electrical lighting fixture family and place it in the ceiling."
+  },
+  {
+    "title": "Place a Sink Fixture",
+    "prompt": "Add a plumbing fixture family (Sink) to a selected room."
+  },
+  {
+    "title": "Select HVAC Equipment",
+    "prompt": "Select all HVAC equipment in the active model."
+  },
+  {
+    "title": "Connect Lighting Fixtures",
+    "prompt": "Add a circuit wiring connection to all selected lighting fixtures."
+  },
+  {
+    "title": "Create a Cable Tray Segment",
+    "prompt": "Create a new cable tray segment between two selected points."
+  },
+  {
+    "title": "Display Pipe Flow Rates",
+    "prompt": "Query and display the flow rate for all pipe segments."
+  },
+  {
+    "title": "Create a Mechanical System",
+    "prompt": "Create a new mechanical system for the selected air terminals."
+  },
+  {
+    "title": "Check MEP Clearance Conflicts",
+    "prompt": "Check all MEP elements for clearance conflicts with structural beams."
+  }
+]

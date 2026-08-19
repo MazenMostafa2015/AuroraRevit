@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Export the Current 3D View",
+    "prompt": "Export the current 3D view to a DWG file."
+  },
+  {
+    "title": "Select Shared Levels and Grids",
+    "prompt": "Select all elements in the project that belong to Workset 'Shared Levels and Grids'."
+  },
+  {
+    "title": "Duplicate the Current View",
+    "prompt": "Duplicate the current view and rename the copy to 'Copy for Review'."
+  },
+  {
+    "title": "Create an A1 Floor Plans Sheet",
+    "prompt": "Create a new sheet named 'A1 - Floor Plans'."
+  },
+  {
+    "title": "Dimension All Walls",
+    "prompt": "Add a dimension chain to all walls in the active plan view."
+  },
+  {
+    "title": "Count Families and Types",
+    "prompt": "Query and display the total number of families and types in the project."
+  },
+  {
+    "title": "Create an Elevation Marker",
+    "prompt": "Create an elevation marker on the selected wall."
+  },
+  {
+    "title": "Batch Rename Floor Plan Views",
+    "prompt": "Batch rename all views starting with 'Floor Plan' to 'FP_' prefix."
+  },
+  {
+    "title": "Export Family Types to CSV",
+    "prompt": "Export all family types in the project to a CSV file."
+  },
+  {
+    "title": "Create a Construction Status Parameter",
+    "prompt": "Create a new project parameter for 'Construction Status' with a Yes/No checkbox."
+  }
+]

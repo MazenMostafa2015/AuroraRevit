@@ -1,0 +1,23 @@
+@AuroraProxy_HostAddress = http://localhost:5000
+
+GET {{AuroraProxy_HostAddress}}/health
+Accept: application/json
+
+###
+
+POST {{AuroraProxy_HostAddress}}/api/revit-query
+Content-Type: application/json
+
+{
+  "prompt": "Connection test from Revit"
+}
+
+### Streaming response
+
+POST {{AuroraProxy_HostAddress}}/api/revit-query/stream
+Content-Type: application/json
+Accept: text/event-stream
+
+{
+  "prompt": "Explain how to select all walls"
+}

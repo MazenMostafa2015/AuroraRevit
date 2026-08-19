@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Create Ground, First, and Second Levels",
+    "prompt": "Create 3 new levels named Ground, First, and Second at 0, 10, and 20 feet."
+  },
+  {
+    "title": "Select All Interior Walls",
+    "prompt": "Select all interior walls in the active view."
+  },
+  {
+    "title": "Create a Curtain Wall Type",
+    "prompt": "Create a new curtain wall type with a grid pattern."
+  },
+  {
+    "title": "Calculate Level 1 Room Area",
+    "prompt": "Calculate the total area of all rooms in level 1."
+  },
+  {
+    "title": "Place Desks in a Room",
+    "prompt": "Place 5 furniture families (Desks) in a selected room."
+  },
+  {
+    "title": "Set Wall Fire Rating",
+    "prompt": "Modify the \"Fire Rating\" parameter of all walls to '2-Hour'."
+  },
+  {
+    "title": "Create a Concrete Floor Type",
+    "prompt": "Create a new floor type with a 6-inch concrete layer."
+  },
+  {
+    "title": "Generate a Door Schedule",
+    "prompt": "Generate a door schedule with their types and widths."
+  },
+  {
+    "title": "Select All Windows",
+    "prompt": "Select all windows in the project."
+  },
+  {
+    "title": "Create a Department Room Color Scheme",
+    "prompt": "Create a new color scheme for rooms by department."
+  }
+]

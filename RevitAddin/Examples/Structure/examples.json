@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Place Columns at Grid Intersections",
+    "prompt": "Create structural columns at all grid intersections on Level 1."
+  },
+  {
+    "title": "Generate Beam Rebar",
+    "prompt": "Generate a straight rebar set for a selected concrete beam."
+  },
+  {
+    "title": "Select Large Steel Beams",
+    "prompt": "Select all steel beams with a size greater than W12x26."
+  },
+  {
+    "title": "Calculate Concrete Column Volume",
+    "prompt": "Calculate the total volume of concrete columns in the project."
+  },
+  {
+    "title": "Place a Structural Beam",
+    "prompt": "Place a new structural framing beam between two selected points."
+  },
+  {
+    "title": "Set Steel Plate Grade",
+    "prompt": "Modify the \"Grade\" parameter of all steel plates to 'A36'."
+  },
+  {
+    "title": "Create a Foundation Slab",
+    "prompt": "Create a foundation slab under the entire building footprint."
+  },
+  {
+    "title": "Create a Structural Framing System",
+    "prompt": "Add a new structural framing system using W8x18 beams at 5-foot spacing."
+  },
+  {
+    "title": "Select Structural Framing",
+    "prompt": "Select all structural framing in a selected view."
+  },
+  {
+    "title": "Create a Structural Elevation Marker",
+    "prompt": "Create a new structural elevation marker."
+  }
+]

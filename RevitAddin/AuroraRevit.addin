@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Aurora Revit AI Assistant</Name>
+    <Assembly>AuroraRevit.RevitAddin.dll</Assembly>
+    <AddInId>7B0A7C2A-6C4B-4DB7-9D3A-EF5E8B5CF901</AddInId>
+    <FullClassName>AuroraRevit.RevitAddin.AuroraApplication</FullClassName>
+    <VendorId>AURORA</VendorId>
+    <VendorDescription>Aurora AI Assistant for Autodesk Revit 2023-2025</VendorDescription>
+  </AddIn>
+</RevitAddIns>

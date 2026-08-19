@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runtime Hardening</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #0D1522; color: #F4F7FB; font-family: "Segoe UI", Arial, sans-serif; padding-top: 0; }
+    .top-rule { min-height: 6px; background: #7C8CFF; }
+    .header { padding: 48px 80px 0 80px; }
+    .kicker { color: #AAB5FF; font: 700 12px Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; }
+    h2 { font-size: 38px; line-height: 1.1; letter-spacing: -1px; margin: 12px 0 0 0; font-weight: 800; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 40px; margin: 44px 80px 0 80px; }
+    .column { border-top: 2px solid #2D3B50; padding-top: 20px; }
+    .col-header { color: #7C8CFF; font: 700 12px Consolas, monospace; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+    .col-title { font-size: 22px; font-weight: 700; color: #F4F7FB; margin-bottom: 14px; }
+    .item { margin-top: 16px; border-top: 1px solid #1C2738; padding-top: 12px; }
+    .item-label { color: #54D69A; font: 600 13px Consolas, monospace; }
+    .item-desc { color: #AAB7C8; font-size: 13.5px; line-height: 1.45; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="top-rule"></div>
+    <header class="header">
+      <div class="kicker">04 / security &amp; reliability</div>
+      <h2>Invalid inputs and provider failures become controlled states</h2>
+    </header>
+    <main class="grid">
+      <section class="column">
+        <div class="col-header">Ring 01</div>
+        <div class="col-title">Prompt Sanitization</div>
+        <div class="item">
+          <div class="item-label">Length Constraints</div>
+          <div class="item-desc">Hard enforcement of a 12,000-character payload boundary to prevent runaway buffer spikes.</div>
+        </div>
+        <div class="item">
+          <div class="item-label">Character Filtering</div>
+          <div class="item-desc">Strips hazardous ASCII control codes while preserving necessary formatting whitespace.</div>
+        </div>
+        <div class="item">
+          <div class="item-label">Empty Guard</div>
+          <div class="item-desc">Rejects whitespace-only queries prior to invoking downstream LLM pipelines.</div>
+        </div>
+      </section>
+
+      <section class="column">
+        <div class="col-header">Ring 02</div>
+        <div class="col-title">Credential Isolation</div>
+        <div class="item">
+          <div class="item-label">IOptions DI Binding</div>
+          <div class="item-desc">ASP.NET Core options pattern strictly separates runtime settings from secrets storage.</div>
+        </div>
+        <div class="item">
+          <div class="item-label">Format Verification</div>
+          <div class="item-desc">Enforces prefix and length structural rules before initializing client SDK instances.</div>
+        </div>
+        <div class="item">
+          <div class="item-label">Zero Secret Leakage</div>
+          <div class="item-desc">API keys are completely excluded from logs, error traces, and client responses.</div>
+        </div>
+      </section>
+
+      <section class="column">
+        <div class="col-header">Ring 03</div>
+        <div class="col-title">Error Normalization</div>
+        <div class="item">
+          <div class="item-label">Deterministic 400s</div>
+          <div class="item-desc">Malformed inputs immediately return structured validation error envelopes.</div>
+        </div>
+        <div class="item">
+          <div class="item-label">Controlled 503s</div>
+          <div class="item-desc">Unconfigured state provides clear setup guidance rather than crashing the pipeline.</div>
+        </div>
+        <div class="item">
+          <div class="item-label">Sanitized 502s</div>
+          <div class="item-desc">Upstream provider exceptions are scrubbed into clear, actionable UI notices.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

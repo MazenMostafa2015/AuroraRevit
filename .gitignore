@@ -1,0 +1,45 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+[Bb]in/
+[Oo]bj/
+Release/
+Debug/
+publish/
+artifacts/
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+.nuget/
+
+# Revit generated/deployment output
+RevitAddin/Deployment/
+RevitAddin/*.dll
+RevitAddin/*.pdb
+
+# Logs and local runtime output
+Logs/
+*.log
+AiProxy.Desktop/Logs/
+
+# Secrets and local configuration
+.env
+.env.*
+!appsettings.json
+appsettings.*.json
+!appsettings.json
+
+# Python validation caches
+__pycache__/
+*.py[cod]
+
+# OS files
+.DS_Store
+Thumbs.db

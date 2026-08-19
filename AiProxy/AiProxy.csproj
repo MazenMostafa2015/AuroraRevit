@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>AuroraRevit.AiProxy</RootNamespace>
+    <AssemblyName>AiProxy</AssemblyName>
+    <UserSecretsId>AuroraRevit-AiProxy</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenAI" Version="2.13.0" />
+  </ItemGroup>
+</Project>

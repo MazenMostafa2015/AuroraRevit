@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operational Boundaries</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #0D1522; color: #F4F7FB; font-family: "Segoe UI", Arial, sans-serif; padding-top: 0; }
+    .top-rule { min-height: 6px; background: #7C8CFF; }
+    .header { padding: 54px 78px 0 78px; }
+    .kicker { color: #AAB5FF; text-transform: uppercase; letter-spacing: 2px; font-size: 12px; font-weight: 700; }
+    h2 { font-size: 39px; letter-spacing: -1px; margin: 14px 0 8px 0; font-weight: 800; }
+    .lede { color: #9BAAC0; font-size: 17px; }
+    .map { display: grid; grid-template-columns: 1fr 20px 1fr 20px 1fr 20px 1fr; margin: 50px 78px 0 78px; align-items: stretch; min-height: 220px; }
+    .stage { padding: 16px 18px 0 0; }
+    .stage-num { color: #6F7F95; font-family: Consolas, monospace; font-size: 12px; }
+    .stage h3 { font-size: 24px; line-height: 1.1; margin: 14px 0 10px 0; }
+    .stage p { color: #AAB7C8; font-size: 14px; line-height: 1.5; max-width: 205px; }
+    .divider { width: 2px; background: #2D3B50; min-height: 184px; justify-self: center; }
+    .arrow { color: #7C8CFF; font-size: 22px; text-align: center; padding-top: 64px; }
+    .tag { display: inline-block; color: #AAB5FF; font-family: Consolas, monospace; font-size: 11px; border-top: 2px solid #7C8CFF; padding-top: 6px; margin-top: 12px; }
+    .lower { margin: 18px 78px 0 78px; border-top: 2px solid #2D3B50; padding-top: 18px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 56px; }
+    .lower h3 { margin: 0 0 8px 0; color: #54D69A; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; }
+    .lower p { margin: 0; color: #AAB7C8; font-size: 14px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="top-rule"></div>
+    <header class="header">
+      <div class="kicker">01 / system map</div>
+      <h2>One solution, four operational boundaries</h2>
+      <div class="lede">Keep Revit API mutations local. Keep provider calls behind the localhost proxy.</div>
+    </header>
+    <main class="map">
+      <section class="stage">
+        <div class="stage-num">01</div>
+        <h3>Revit 2023–2025</h3>
+        <p>External application, command, dockable panel, and transaction-safe action handler.</p>
+        <div class="tag">REVIT API</div>
+      </section>
+      <div class="arrow">›</div>
+      <section class="stage">
+        <div class="stage-num">02</div>
+        <h3>WPF chat panel</h3>
+        <p>Prompt input, 40 examples, loading state, SSE deltas, and code review actions.</p>
+        <div class="tag">UI BOUNDARY</div>
+      </section>
+      <div class="arrow">›</div>
+      <section class="stage">
+        <div class="stage-num">03</div>
+        <h3>AiProxy</h3>
+        <p>JSON and SSE routes, CORS, validation, port fallback, OpenAI configuration, and normalization.</p>
+        <div class="tag">LOCALHOST :5000 / :5001</div>
+      </section>
+      <div class="arrow">›</div>
+      <section class="stage">
+        <div class="stage-num">04</div>
+        <h3>OpenAI service</h3>
+        <p>System prompt, typed action JSON, asynchronous completion, and streamed deltas.</p>
+        <div class="tag">PROVIDER</div>
+      </section>
+    </main>
+    <section class="lower">
+      <div>
+        <h3>Proxy GUI host</h3>
+        <p>AiProxy.Desktop owns lifecycle controls, health polling, active endpoint display, and process logs.</p>
+      </div>
+      <div>
+        <h3>Embedded examples</h3>
+        <p>Architecture, Structure, MEP, and General libraries remain compiled into the Revit add-in assembly.</p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

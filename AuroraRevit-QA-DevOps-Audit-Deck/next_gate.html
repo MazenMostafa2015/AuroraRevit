@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Self-Audit &amp; Next Gate</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #0D1522; color: #F4F7FB; font-family: "Segoe UI", Arial, sans-serif; padding-top: 0; }
+    .top-rule { min-height: 6px; background: #7C8CFF; width: 100%; }
+    .header { padding: 46px 78px 0 78px; }
+    .kicker { color: #AAB5FF; font: 700 12px Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; }
+    h2 { font-size: 38px; line-height: 1.1; letter-spacing: -1px; margin: 12px 0 0 0; font-weight: 800; }
+    .lede { color: #9BAAC0; font-size: 16px; margin-top: 6px; }
+    
+    .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; column-gap: 56px; margin: 38px 78px 0 78px; }
+    .col-title { color: #54D69A; font: 700 12px Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid #2D3B50; padding-bottom: 8px; margin-bottom: 16px; }
+    .col-title.accent { color: #7C8CFF; }
+
+    .fix-item { display: grid; grid-template-columns: 140px 1fr; column-gap: 16px; border-bottom: 1px solid #1E293B; padding-top: 10px; font-size: 13.5px; }
+    .fix-area { color: #AAB5FF; font: 600 12px Consolas, monospace; }
+    .fix-text { color: #AAB7C8; line-height: 1.45; }
+    .fix-text strong { color: #F4F7FB; }
+
+    .gate-item { margin-bottom: 18px; border-left: 2px solid #7C8CFF; padding-left: 14px; padding-top: 2px; }
+    .gate-h { font-size: 15px; font-weight: 700; color: #F4F7FB; }
+    .gate-p { color: #8F9EB2; font-size: 13px; line-height: 1.4; margin-top: 4px; }
+    
+    .footer-bar { margin: 26px 78px 0 78px; border-top: 1px solid #2D3B50; padding-top: 12px; display: flex; justify-content: space-between; font: 12px Consolas, monospace; color: #6F7F95; }
+    .status-ok { color: #54D69A; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="top-rule"></div>
+    <header class="header">
+      <div class="kicker">07 / Verification &amp; Delivery</div>
+      <h2>Self-audit converted risks into explicit controls</h2>
+      <div class="lede">All identified regressions resolved; definitive build gating transitioned to Windows CI.</div>
+    </header>
+
+    <main class="grid">
+      <section>
+        <div class="col-title">Remediated Self-Audit Findings</div>
+        
+        <div class="fix-item">
+          <div class="fix-area">ASP.NET Core DI</div>
+          <div class="fix-text">Injected <strong>IOptions&lt;OpenAiOptions&gt;</strong> into OpenAiChatService to properly bind configuration at runtime.</div>
+        </div>
+
+        <div class="fix-item">
+          <div class="fix-area">Cross-Target JSON</div>
+          <div class="fix-text">Migrated all serializers to <strong>System.Text.Json</strong>, eliminating net48-only JavaScriptSerializer blocks on net8.</div>
+        </div>
+
+        <div class="fix-item">
+          <div class="fix-area">WPF Lifecycle</div>
+          <div class="fix-text">Removed duplicate <strong>StartupUri</strong> in App.xaml to prevent double window initialization on launch.</div>
+        </div>
+
+        <div class="fix-item">
+          <div class="fix-area">Relative Paths</div>
+          <div class="fix-text">Corrected ProxyGui binary resolution to locate published <strong>AiProxy.exe</strong> in sibling directories.</div>
+        </div>
+
+        <div class="fix-item">
+          <div class="fix-area">Port Collisions</div>
+          <div class="fix-text">Implemented automatic <strong>5000 &rarr; 5001</strong> fallback resolver with active endpoint reporting in script &amp; GUI.</div>
+        </div>
+      </section>
+
+      <section>
+        <div class="col-title accent">Authoritative Release Gates</div>
+        
+        <div class="gate-item">
+          <div class="gate-h">1. GitHub Actions Live Pipeline</div>
+          <div class="gate-p">Merge triggers windows-latest matrix restore, release compilation, dual self-contained publishing, and artifact upload.</div>
+        </div>
+
+        <div class="gate-item">
+          <div class="gate-h">2. Windows Desktop Verification</div>
+          <div class="gate-p">Validate AuroraRevit.ProxyGui.exe start/stop controls, health check polling, and live console streaming.</div>
+        </div>
+
+        <div class="gate-item">
+          <div class="gate-h">3. Revit 2023–2025 Host Smoke Test</div>
+          <div class="gate-p">Load generated .addin manifest, open dockable chat panel, test SSE streaming, and verify Transaction-safe wall selection.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer-bar">
+      <span>SOURCE STATUS: <span class="status-ok">READY FOR MERGE &amp; GITHUB ACTIONS RUN</span></span>
+      <span>AURORA REVIT AI ASSISTANT · QA / DEVOPS SIGN-OFF</span>
+    </footer>
+  </div>
+</body>
+</html>

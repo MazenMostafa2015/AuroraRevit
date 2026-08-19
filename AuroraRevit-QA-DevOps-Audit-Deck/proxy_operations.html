@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proxy Operations</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #0D1522; color: #F4F7FB; font-family: "Segoe UI", Arial, sans-serif; padding-top: 0; }
+    .top-rule { min-height: 8px; background: #7C8CFF; }
+    .header { padding: 52px 80px 0 80px; }
+    .kicker { color: #AAB5FF; font: 700 12px Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; }
+    h2 { font-size: 40px; line-height: 1.08; letter-spacing: -1px; margin: 14px 0 0 0; font-weight: 800; }
+    .grid { display: grid; grid-template-columns: 0.9fr 1.35fr; column-gap: 72px; margin: 40px 80px 0 80px; }
+    .status-area { border-top: 2px solid #54D69A; padding-top: 20px; }
+    .status-label { color: #7D8EA5; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; }
+    .running { color: #54D69A; font-size: 67px; font-weight: 800; letter-spacing: -2px; margin-top: 8px; }
+    .endpoint { color: #B6C1D2; font: 14px Consolas, monospace; margin-top: 12px; }
+    .port-note { color: #E0B068; font-size: 13px; line-height: 1.45; max-width: 330px; margin-top: 24px; }
+    .rows { border-top: 1px solid #2D3B50; }
+    .row { display: grid; grid-template-columns: 170px 1fr; column-gap: 28px; border-bottom: 1px solid #2D3B50; padding: 12px 0 0 0; min-height: 72px; }
+    .row-title { color: #F4F7FB; font-weight: 700; font-size: 17px; }
+    .row-body { color: #AAB7C8; font-size: 14px; line-height: 1.45; padding-right: 8px; }
+    .mono { color: #7C8CFF; font: 11px Consolas, monospace; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="top-rule"></div>
+    <header class="header">
+      <div class="kicker">02 / proxy operations</div>
+      <h2>The proxy is operable, observable, and resilient</h2>
+    </header>
+    <main class="grid">
+      <section class="status-area">
+        <div class="status-label">Default runtime state</div>
+        <div class="running">RUNNING</div>
+        <div class="endpoint">http://localhost:5000</div>
+        <div class="port-note">If port 5000 is occupied, the resolver and GUI move to port 5001 and report the active endpoint.</div>
+      </section>
+      <section class="rows">
+        <div class="row">
+          <div class="row-title">WPF GUI host</div>
+          <div class="row-body">Start/stop controls, Running/Starting/Stopped/Unhealthy states, endpoint display, and clean shutdown.<div class="mono">AiProxy.Desktop</div></div>
+        </div>
+        <div class="row">
+          <div class="row-title">Observability</div>
+          <div class="row-body">Health polling against <span class="mono">/health</span>, process output capture, live log view, and active endpoint probing.</div>
+        </div>
+        <div class="row">
+          <div class="row-title">Release shape</div>
+          <div class="row-body">Self-contained <span class="mono">win-x64</span> publishing for both the headless proxy and the GUI, with GitHub artifact upload.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

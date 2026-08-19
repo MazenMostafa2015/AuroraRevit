@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faster Review Without Unsafe Automation</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #0D1522; color: #F4F7FB; font-family: "Segoe UI", Arial, sans-serif; padding-top: 0; }
+    .top-rule { min-height: 6px; background: #7C8CFF; width: 100%; }
+    .header { padding: 50px 78px 0 78px; }
+    .kicker { color: #AAB5FF; font: 700 12px Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; }
+    h2 { font-size: 38px; line-height: 1.1; letter-spacing: -1px; margin: 12px 0 0 0; font-weight: 800; }
+    .lede { color: #9BAAC0; font-size: 16px; margin-top: 8px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 60px; margin: 44px 78px 0 78px; }
+    .column { border-top: 2px solid #2D3B50; padding-top: 20px; }
+    .col-title { color: #54D69A; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+    .col-title.accent { color: #7C8CFF; }
+    .item { margin-bottom: 24px; }
+    .item-h { font-size: 17px; font-weight: 700; color: #F4F7FB; margin-bottom: 6px; }
+    .item-p { color: #AAB7C8; font-size: 14px; line-height: 1.5; }
+    .mono { color: #AAB5FF; font: 12px Consolas, monospace; background: #172030; padding: 2px 6px; display: inline-block; margin-top: 4px; }
+    .tag { display: inline-block; color: #E0B068; font: 700 11px Consolas, monospace; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="top-rule"></div>
+    <header class="header">
+      <div class="kicker">03 / safety &amp; ux</div>
+      <h2>Faster Review Without Unsafe Automation</h2>
+      <div class="lede">Accelerate developer workflows while maintaining strict execution safeguards in Revit.</div>
+    </header>
+    <main class="grid">
+      <section class="column">
+        <div class="col-title accent">Review &amp; Transfer Flow</div>
+        <div class="item">
+          <div class="item-h">In-Chat Execution Copying</div>
+          <div class="item-p">New <span class="mono">Copy this Execution</span> button added directly into assistant chat bubbles for single-click clipboard transfer.</div>
+        </div>
+        <div class="item">
+          <div class="item-h">Dedicated WPF Code Viewer</div>
+          <div class="item-p">Opens generated C# snippets in a syntax-highlighted review window with copy and RevitPythonShell transfer options.</div>
+        </div>
+        <div class="item">
+          <div class="item-h">Strict User Approval Boundary</div>
+          <div class="item-p">AI-generated code is never auto-executed against the Revit document without explicit human inspection and action.</div>
+        </div>
+      </section>
+
+      <section class="column">
+        <div class="col-title">Revit Guardrails</div>
+        <div class="item">
+          <div class="item-h">ExternalEvent Modeless Dispatch</div>
+          <div class="item-p">All async proxy events marshal safely into Revit's main UI thread through dedicated <span class="mono">IExternalEventHandler</span> implementations.</div>
+        </div>
+        <div class="item">
+          <div class="item-h">Transaction Isolation</div>
+          <div class="item-p">Mutations are wrapped in <span class="mono">using (Transaction tx = new Transaction(doc, "AI Action"))</span> to ensure atomic rollback and crash prevention.</div>
+        </div>
+        <div class="item">
+          <div class="item-h">Safe Selection Execution</div>
+          <div class="item-p">Element selection queries execute via <span class="mono">FilteredElementCollector</span> with validated document scopes.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

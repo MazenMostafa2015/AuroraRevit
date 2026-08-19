@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CI Pipeline</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #0D1522; color: #F4F7FB; font-family: "Segoe UI", Arial, sans-serif; padding-top: 0; }
+    .top-rule { min-height: 6px; background: #7C8CFF; }
+    .header { padding: 48px 78px 0 78px; }
+    .kicker { color: #AAB5FF; font: 700 12px Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; }
+    h2 { font-size: 38px; line-height: 1.1; letter-spacing: -1px; margin: 12px 0 0 0; font-weight: 800; }
+    
+    .pipeline-strip { display: grid; grid-template-columns: repeat(5, 1fr); margin: 36px 78px 0 78px; border-top: 2px solid #7C8CFF; padding-top: 16px; column-gap: 16px; }
+    .p-step { padding-top: 4px; }
+    .p-num { color: #7C8CFF; font: 700 11px Consolas, monospace; letter-spacing: 1px; }
+    .p-name { color: #F4F7FB; font-weight: 700; font-size: 15px; margin-top: 4px; }
+    .p-desc { color: #8F9EB2; font-size: 12px; margin-top: 4px; line-height: 1.4; }
+
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 48px; margin: 36px 78px 0 78px; border-top: 1px solid #2D3B50; padding-top: 24px; }
+    .col-title { color: #54D69A; font: 700 12px Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+    
+    .matrix-box { display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 12px; }
+    .m-item { border-left: 2px solid #2D3B50; padding-left: 10px; padding-top: 2px; }
+    .m-ver { color: #F4F7FB; font-weight: 700; font-size: 14px; }
+    .m-tf { color: #AAB7C8; font: 12px Consolas, monospace; margin-top: 3px; }
+    .m-pkg { color: #6F7F95; font: 11px Consolas, monospace; margin-top: 4px; }
+
+    .artifact-list { list-style: none; padding: 0; margin: 0; }
+    .artifact-item { display: flex; justify-content: space-between; border-bottom: 1px solid #1E293B; padding-top: 6px; font-size: 13px; font-family: Consolas, monospace; }
+    .art-name { color: #F4F7FB; }
+    .art-role { color: #8F9EB2; }
+    
+    .footer-note { margin: 28px 78px 0 78px; color: #6F7F95; font-size: 12px; font-family: Consolas, monospace; border-top: 1px solid #1E293B; padding-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="top-rule"></div>
+    <header class="header">
+      <div class="kicker">05 / CI &amp; Artifact Automation</div>
+      <h2>Reproducible Windows builds for three Revit versions</h2>
+    </header>
+    
+    <section class="pipeline-strip">
+      <div class="p-step">
+        <div class="p-num">STEP 01</div>
+        <div class="p-name">Trigger &amp; Runner</div>
+        <div class="p-desc">Push to main &amp; PRs on <span style="font-family: Consolas; color: #AAB7C8;">windows-latest</span></div>
+      </div>
+      <div class="p-step">
+        <div class="p-num">STEP 02</div>
+        <div class="p-name">Setup &amp; Restore</div>
+        <div class="p-desc">Setup .NET 8.0 SDK + NuGet matrix restore</div>
+      </div>
+      <div class="p-step">
+        <div class="p-num">STEP 03</div>
+        <div class="p-name">Solution Build</div>
+        <div class="p-desc">Release configuration build across Revit targets</div>
+      </div>
+      <div class="p-step">
+        <div class="p-num">STEP 04</div>
+        <div class="p-name">Publish Executables</div>
+        <div class="p-desc">Self-contained win-x64 AiProxy &amp; AiProxyGui</div>
+      </div>
+      <div class="p-step">
+        <div class="p-num">STEP 05</div>
+        <div class="p-name">Package &amp; Upload</div>
+        <div class="p-desc">Generate manifests &amp; upload v4 artifacts</div>
+      </div>
+    </section>
+
+    <main class="details-grid">
+      <div>
+        <div class="col-title">Revit Version Matrix</div>
+        <div class="matrix-box">
+          <div class="m-item">
+            <div class="m-ver">Revit 2023</div>
+            <div class="m-tf">net48</div>
+            <div class="m-pkg">Nice3point 2023.1.90</div>
+          </div>
+          <div class="m-item">
+            <div class="m-ver">Revit 2024</div>
+            <div class="m-tf">net48</div>
+            <div class="m-pkg">Nice3point 2024.3.60</div>
+          </div>
+          <div class="m-item">
+            <div class="m-ver">Revit 2025</div>
+            <div class="m-tf">net8.0-windows</div>
+            <div class="m-pkg">Nice3point 2025.4.60</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="col-title">Uploaded Artifacts (.zip)</div>
+        <div class="artifact-list">
+          <div class="artifact-item">
+            <span class="art-name">AuroraRevit.RevitAddin.dll</span>
+            <span class="art-role">Compiled Add-in Binary</span>
+          </div>
+          <div class="artifact-item">
+            <span class="art-name">AuroraRevit.addin</span>
+            <span class="art-role">Version-Matched Manifest</span>
+          </div>
+          <div class="artifact-item">
+            <span class="art-name">publish/AiProxy/**</span>
+            <span class="art-role">Headless Proxy Server</span>
+          </div>
+          <div class="artifact-item">
+            <span class="art-name">publish/AiProxyGui/**</span>
+            <span class="art-role">WPF Host Application</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer-note">
+      FILE: .github/workflows/build-revit-addin.yml · ACTION: actions/upload-artifact@v4 (14-day retention)
+    </div>
+  </div>
+</body>
+</html>
