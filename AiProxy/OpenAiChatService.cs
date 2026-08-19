@@ -82,7 +82,8 @@ public sealed class OpenAiChatService
             new UserChatMessage(prompt)
         };
 
-        var completion = await _chatClient!.CompleteChatAsync(messages);
+        var completionResult = await _chatClient!.CompleteChatAsync(messages);
+        var completion = completionResult.Value;
         if (completion.Content.Count == 0 || string.IsNullOrWhiteSpace(completion.Content[0].Text))
         {
             throw new InvalidOperationException("OpenAI returned an empty response.");

@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AuroraRevit.AiProxy;
 
 var builder = WebApplication.CreateBuilder(args);
 var listenUrl = ProxyPortResolver.ResolveUrl(args);

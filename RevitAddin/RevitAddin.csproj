@@ -21,7 +21,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
 
-    <PackageReference Include="System.Text.Json" Version="8.0.18" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
 
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI"
                       Version="2023.1.90"
