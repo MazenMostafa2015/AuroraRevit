@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>AuroraRevit.AiProxy.Desktop</RootNamespace>
     <AssemblyName>AuroraRevit.ProxyGui</AssemblyName>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 

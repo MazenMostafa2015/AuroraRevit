@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>AuroraRevit.AiProxy</RootNamespace>
     <AssemblyName>AiProxy</AssemblyName>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <UserSecretsId>AuroraRevit-AiProxy</UserSecretsId>
   </PropertyGroup>
 

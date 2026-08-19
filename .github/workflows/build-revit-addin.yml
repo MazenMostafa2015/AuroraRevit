@@ -28,7 +28,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore solution
-        run: dotnet restore AuroraRevit.sln -p:RevitVersion=${{ matrix.revit-version }}
+        run: dotnet restore AuroraRevit.sln -p:RevitVersion=${{ matrix.revit-version }} -r win-x64
 
       - name: Build solution in Release mode
         run: dotnet build AuroraRevit.sln --configuration Release --no-restore -p:RevitVersion=${{ matrix.revit-version }}
