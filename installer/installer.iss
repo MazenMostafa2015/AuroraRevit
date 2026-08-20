@@ -85,7 +85,7 @@ begin
   Result := True;
 end;
 
-function ReplaceAssemblyPath(Content: String; AssemblyPath: String): String;
+function ReplaceAssemblyPath(Content: AnsiString; AssemblyPath: String): AnsiString;
 var
   StartPos: Integer;
   EndPos: Integer;
@@ -111,7 +111,7 @@ var
   ManifestSource: String;
   AssemblyDestination: String;
   ManifestDestination: String;
-  ManifestContent: String;
+  ManifestContent: AnsiString;
 begin
   SourceRoot := ExpandConstant('{app}\Payload\Revit' + Year);
   AddinDirectory := ExpandConstant('{userappdata}\Autodesk\Revit\Addins\' + Year);
