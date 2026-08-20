@@ -58,5 +58,65 @@
   {
     "title": "Create Roof Level at 15 Meters",
     "prompt": "Create a new Level named 'Roof' at 15 meters elevation."
+  },
+  {
+    "title": "Create a Door Schedule with Fire Ratings",
+    "prompt": "Create a door schedule named A-DOOR with mark, width, and fire rating columns.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Door Schedule with Fire Ratings\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Doors);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"A-DOOR\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create an Exterior Wall Schedule",
+    "prompt": "Create a schedule named A-WALL for exterior walls with type, length, and area fields.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create an Exterior Wall Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Walls);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"A-WALL\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Find Rooms Missing Department",
+    "prompt": "Report rooms that have no Department value in the active model.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Find Rooms Missing Department\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Rooms);\n    var rooms = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements();\n    var missing = rooms.Count(room => string.IsNullOrWhiteSpace(room.LookupParameter(\"Department\")?.AsString()));\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Reflected Ceiling Plan",
+    "prompt": "Create a reflected ceiling plan named RCP - Level 1 for Level 1.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Reflected Ceiling Plan\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Ceilings);\n    var level = new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().FirstOrDefault(x => x.Name == \"Level 1\");\n    if (level == null) return;\n    var view = ViewPlan.Create(doc, new ElementId(BuiltInViewFamily.ViewFamilyCeilingPlan), level.Id);\n    view.Name = \"RCP - Level 1\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Count Windows by Type",
+    "prompt": "Count all window instances grouped by family and type.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Count Windows by Type\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Windows);\n    var windows = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Windows).WhereElementIsNotElementType().ToElements();\n    var counts = windows.GroupBy(x => x.GetTypeId()).Select(g => new { TypeId = g.Key, Count = g.Count() }).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create an Area Plan View",
+    "prompt": "Create an area plan view for the gross building area scheme.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create an Area Plan View\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Areas);\n    var areaScheme = new FilteredElementCollector(doc).OfClass(typeof(AreaScheme)).Cast<AreaScheme>().FirstOrDefault();\n    if (areaScheme == null) return;\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Set Room Occupancy Loads",
+    "prompt": "Set the Occupancy parameter to 2 people for selected rooms.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Set Room Occupancy Loads\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Rooms);\n    var rooms = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements();\n    var editable = rooms.Where(x => x.LookupParameter(\"Occupancy\") != null).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Wall Type Schedule",
+    "prompt": "Create a schedule named A-WALL-TYPES for wall types and their widths.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Wall Type Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Walls);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"A-WALL-TYPES\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "List Unplaced Rooms",
+    "prompt": "List all rooms that are not placed in a plan view.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: List Unplaced Rooms\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Rooms);\n    var unplaced = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements().Where(x => x.Location == null).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Presentation Sheet",
+    "prompt": "Create a new sheet named A-100 Presentation with the selected title block.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Presentation Sheet\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Sheets);\n    var titleBlock = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_TitleBlocks).WhereElementIsElementType().FirstOrDefault();\n    if (titleBlock == null) return;\n    var sheet = ViewSheet.Create(doc, titleBlock.Id);\n    sheet.SheetNumber = \"A-100\";\n    sheet.Name = \"Presentation\";\n}",
+    "version": "1.8.3"
   }
 ]

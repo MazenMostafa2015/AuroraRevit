@@ -16,7 +16,14 @@ public sealed class OpenAiOptions
 
 public sealed class OpenAiChatService
 {
-    public const string RevitSystemPrompt = "You are an expert Revit API C# assistant. Use the namespace Autodesk.Revit.DB. If the user asks for a selection, return a JSON object { \"type\": \"select\", \"query\": \"some filter\" }. If they ask for C# code, return { \"type\": \"code\", \"content\": \"the code here\" }. If the user asks for information, return { \"type\": \"info\", \"message\": \"the answer\" }. Do not add markdown formatting to the JSON.";
+    public const string ActionCatalog = "Allowed Revit categories: walls, doors, windows, floors, roofs, ceilings, columns, beams, rooms, mechanical_equipment, ducts, pipes, cable_trays, air_terminals, electrical_equipment, lighting_fixtures, plumbing_fixtures, structural_framing, structural_columns, structural_foundations, rebar, sheets, views, areas, revisions, and generic_model. Ducts, pipes, and cable_trays are explicitly supported categories and must never be rejected as unsupported.";
+
+    public const string RevitSystemPrompt = "You are an expert Revit API C# assistant. Use the namespace Autodesk.Revit.DB. " + ActionCatalog + " " +
+        "For selection requests, return exactly { \"type\": \"select\", \"query\": \"a supported category query\" }. " +
+        "For schedule requests, return exactly { \"type\": \"schedule\", \"category\": \"ducts|pipes|cable_trays|...\", \"name\": \"schedule name\" }. " +
+        "For C# code requests, return { \"type\": \"code\", \"content\": \"the code here\" }. " +
+        "For information requests, return { \"type\": \"info\", \"message\": \"the answer\" }. " +
+        "Never reject ducts, pipes, or cable_trays. Do not add markdown formatting to the JSON.";
 
     private readonly ChatClient? _chatClient;
     private readonly bool _isConfigured;

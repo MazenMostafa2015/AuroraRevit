@@ -44,7 +44,7 @@
     "prompt": "Select all steel beams with a size greater than W12x26."
   },
   {
-    "title": "Calculate Concrete Column Volume",
+    "title": "Calculate Concrete Column Volume (Legacy Duplicate)",
     "prompt": "Calculate the total volume of concrete columns in the project."
   },
   {
@@ -58,5 +58,65 @@
   {
     "title": "Create Structural Elevation Marker",
     "prompt": "Create a new structural elevation marker."
+  },
+  {
+    "title": "Create a Concrete Column Schedule",
+    "prompt": "Create a schedule named S-COL for structural columns with type and base level.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Concrete Column Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralColumns);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"S-COL\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Structural Beam Schedule",
+    "prompt": "Create a schedule named S-BEAM for structural framing members.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Structural Beam Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralFraming);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"S-BEAM\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Find Beams with No Structural Usage",
+    "prompt": "Find structural framing elements whose Structural Usage parameter is empty.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Find Beams with No Structural Usage\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralFraming);\n    var beams = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralFraming).WhereElementIsNotElementType().ToElements();\n    var missing = beams.Where(x => string.IsNullOrWhiteSpace(x.LookupParameter(\"Structural Usage\")?.AsValueString())).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Set Column Comments",
+    "prompt": "Set the Comments parameter of selected structural columns to Foundation Review.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Set Column Comments\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralColumns);\n    var columns = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralColumns).WhereElementIsNotElementType().ToElements();\n    var editable = columns.Where(x => x.LookupParameter(\"Comments\") != null).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Count Structural Framing by Type",
+    "prompt": "Count structural framing elements grouped by type.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Count Structural Framing by Type\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralFraming);\n    var framing = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralFraming).WhereElementIsNotElementType().ToElements();\n    var counts = framing.GroupBy(x => x.GetTypeId()).Select(g => new { TypeId = g.Key, Count = g.Count() }).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Structural Foundation Schedule",
+    "prompt": "Create a schedule named S-FOUNDATION for structural foundations.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Structural Foundation Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralFoundation);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"S-FOUNDATION\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Find Beams Above Level 2",
+    "prompt": "Find structural beams whose elevation is above Level 2.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Find Beams Above Level 2\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralFraming);\n    var level = new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().FirstOrDefault(x => x.Name == \"Level 2\");\n    if (level == null) return;\n    var beams = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralFraming).WhereElementIsNotElementType().Where(x => (x.Location as LocationCurve)?.Curve?.GetEndPoint(0).Z > level.Elevation).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Structural 3D Coordination View",
+    "prompt": "Create a dedicated 3D view named S-Coordination.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Structural 3D Coordination View\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralFraming);\n    var viewType = new FilteredElementCollector(doc).OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>().FirstOrDefault(x => x.ViewFamily == ViewFamily.ThreeDimensional);\n    if (viewType == null) return;\n    var view = View3D.CreateIsometric(doc, viewType.Id);\n    view.Name = \"S-Coordination\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Schedule Rebar by Bar Diameter",
+    "prompt": "Create a schedule named S-REBAR grouped by rebar bar diameter.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Schedule Rebar by Bar Diameter\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_Rebar);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"S-REBAR\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Select Structural Columns at Level 1",
+    "prompt": "Select all structural columns associated with Level 1.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Select Structural Columns at Level 1\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_StructuralColumns);\n    var columns = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralColumns).WhereElementIsNotElementType().ToElements();\n    var levelOne = columns.Where(x => x.LevelId != ElementId.InvalidElementId).ToList();\n}",
+    "version": "1.8.3"
   }
 ]

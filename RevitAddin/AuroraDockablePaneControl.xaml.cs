@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -13,6 +15,9 @@ namespace AuroraRevit.RevitAddin
         private readonly AuroraProxyClient _proxyClient;
         private readonly RevitActionHandler _revitActionHandler;
         private CancellationTokenSource _streamCancellation;
+        private readonly StringBuilder _actionLog = new StringBuilder();
+        private IReadOnlyList<RevitExample> _exampleLibrary = new List<RevitExample>();
+        private bool _isLightTheme;
 
         public AuroraDockablePaneControl()
         {
@@ -62,26 +67,40 @@ namespace AuroraRevit.RevitAddin
         {
             try
             {
-                ExampleComboBox.ItemsSource = RevitExampleLibrary.LoadAll();
+                _exampleLibrary = RevitExampleLibrary.LoadAll();
+                ArchitectureExamplesList.ItemsSource = _exampleLibrary.Where(x => x.Discipline == "Architecture").ToList();
+                StructureExamplesList.ItemsSource = _exampleLibrary.Where(x => x.Discipline == "Structure").ToList();
+                MepExamplesList.ItemsSource = _exampleLibrary.Where(x => x.Discipline == "MEP").ToList();
+                GeneralExamplesList.ItemsSource = _exampleLibrary.Where(x => x.Discipline == "General").ToList();
             }
             catch (Exception exception)
             {
-                ExampleComboBox.IsEnabled = false;
-                ExampleComboBox.ToolTip = "Example Library could not be loaded: " + exception.Message;
+                ProxyStatusText.Text = "  Example gallery unavailable";
+                ProxyStatusText.ToolTip = exception.Message;
             }
         }
 
-        private void ExampleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ExampleList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedExample = ExampleComboBox.SelectedItem as RevitExample;
+            var list = sender as ListBox;
+            var selectedExample = list == null ? null : list.SelectedItem as RevitExample;
             if (selectedExample == null)
             {
                 return;
             }
 
             PromptTextBox.Text = selectedExample.Prompt;
+            ExampleCodeTextBox.Text = selectedExample.CodeTemplate ?? "No code template is available for this legacy example.";
+            ExampleCodePanel.Visibility = Visibility.Visible;
             PromptTextBox.Focus();
             PromptTextBox.CaretIndex = PromptTextBox.Text.Length;
+            await SendPromptAsync();
+            list.SelectedItem = null;
+        }
+
+        private void CopyExampleCodeButton_Click(object sender, RoutedEventArgs e)
+        {
+            CopyTextToClipboard(ExampleCodeTextBox.Text, "The example code template was copied to the clipboard.");
         }
 
         private async void SendButton_Click(object sender, RoutedEventArgs e)
@@ -107,6 +126,7 @@ namespace AuroraRevit.RevitAddin
             }
 
             AddUserMessage(prompt);
+            AppendActionLog("PROMPT", prompt);
             PromptTextBox.Clear();
             SetLoading(true);
 
@@ -136,7 +156,8 @@ namespace AuroraRevit.RevitAddin
 
                 if (!string.IsNullOrWhiteSpace(streamError))
                 {
-                    SetMessageText(assistantBubble, streamError);
+                    SetMessageText(assistantBubble, FriendlyError(streamError));
+                    AppendActionLog("ERROR", streamError);
                 }
                 else
                 {
@@ -151,9 +172,9 @@ namespace AuroraRevit.RevitAddin
             }
             catch (Exception exception)
             {
-                SetMessageText(
-                    assistantBubble,
-                    "I couldn’t reach the streaming Aurora proxy. Start AiProxy on http://localhost:5000 and try again.\n\n" + exception.Message);
+                var friendly = FriendlyError(exception.Message);
+                SetMessageText(assistantBubble, friendly);
+                AppendActionLog("ERROR", exception.Message);
                 ShowToast(assistantBubble.Text);
             }
             finally
@@ -193,10 +214,11 @@ namespace AuroraRevit.RevitAddin
             RevitAction action;
             if (RevitActionParser.TryParse(result, out action))
             {
-                if (action.IsSelectAction)
+                if (action.IsScheduleAction || action.IsSelectAction)
                 {
                     var actionResult = await _revitActionHandler.RaiseAsync(action);
                     SetMessageText(assistantBubble, actionResult.Message);
+                    AppendActionLog(action.Type.ToUpperInvariant(), actionResult.Message);
                     return;
                 }
 
@@ -232,10 +254,11 @@ namespace AuroraRevit.RevitAddin
             RevitAction action;
             if (RevitActionParser.TryParse(result, out action))
             {
-                if (action.IsSelectAction)
+                if (action.IsScheduleAction || action.IsSelectAction)
                 {
                     var actionResult = await _revitActionHandler.RaiseAsync(action);
                     AddAssistantMessage(actionResult.Message);
+                    AppendActionLog(action.Type.ToUpperInvariant(), actionResult.Message);
                     return;
                 }
 
@@ -297,8 +320,7 @@ namespace AuroraRevit.RevitAddin
             {
                 try
                 {
-                    Clipboard.SetText(code);
-                    MessageBox.Show("The generated C# execution was copied to the clipboard for review.", "Aurora AI Assistant", MessageBoxButton.OK, MessageBoxImage.Information);
+                    CopyTextToClipboard(code, "The generated C# execution was copied to the clipboard for review.");
                 }
                 catch (Exception exception)
                 {
@@ -311,9 +333,60 @@ namespace AuroraRevit.RevitAddin
             ChatScrollViewer.ScrollToEnd();
         }
 
+        private void ThemeToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            _isLightTheme = !_isLightTheme;
+            var panel = (SolidColorBrush)FindResource("PanelBackground");
+            var surface = (SolidColorBrush)FindResource("SurfaceBackground");
+            var primary = (SolidColorBrush)FindResource("PrimaryText");
+            var secondary = (SolidColorBrush)FindResource("SecondaryText");
+            panel.Color = (Color)ColorConverter.ConvertFromString(_isLightTheme ? "#F4F7FB" : "#10141C");
+            surface.Color = (Color)ColorConverter.ConvertFromString(_isLightTheme ? "#FFFFFF" : "#171D28");
+            primary.Color = (Color)ColorConverter.ConvertFromString(_isLightTheme ? "#172033" : "#F4F7FB");
+            secondary.Color = (Color)ColorConverter.ConvertFromString(_isLightTheme ? "#526078" : "#97A3B6");
+            ThemeToggleButton.Content = _isLightTheme ? "Dark Theme" : "Light Theme";
+            AppendActionLog("THEME", _isLightTheme ? "Light theme enabled." : "Dark theme enabled.");
+        }
+
+        private void FeedbackButton_Click(object sender, RoutedEventArgs e)
+        {
+            var text = _actionLog.Length == 0 ? "Aurora action log is empty." : _actionLog.ToString();
+            CopyTextToClipboard(text, "The Aurora action log was copied for debugging feedback.");
+        }
+
+        private void CopyTextToClipboard(string text, string confirmation)
+        {
+            try
+            {
+                Clipboard.SetText(text ?? string.Empty);
+                MessageBox.Show(confirmation, "Aurora AI Assistant", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show("Unable to copy the text. " + exception.Message, "Aurora AI Assistant", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void AppendActionLog(string type, string message)
+        {
+            _actionLog.Append('[').Append(DateTime.Now.ToString("HH:mm:ss")).Append("] ")
+                .Append(type ?? "INFO").Append(" | ").AppendLine(message ?? string.Empty);
+        }
+
+        private static string FriendlyError(string message)
+        {
+            var value = message ?? string.Empty;
+            if (value.IndexOf("401", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("api key", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "Aurora could not authenticate with the AI provider. Check the OpenAI API key in the local proxy settings, then try again.";
+            if (value.IndexOf("localhost", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("connection", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "Aurora cannot reach the local proxy. Start AiProxy or Aurora Proxy GUI on port 5000, then try again.";
+            return "Aurora could not complete that request. Review the prompt and active Revit document, then try again.\n\nDetails: " + value;
+        }
+
         private void SetLoading(bool isLoading)
         {
             LoadingPanel.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
+            ThinkingProgressBar.IsIndeterminate = isLoading;
             SendButton.IsEnabled = !isLoading;
             PromptTextBox.IsEnabled = !isLoading;
             CompactSendButton.IsEnabled = !isLoading;

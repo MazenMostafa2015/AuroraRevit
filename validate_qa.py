@@ -16,13 +16,14 @@ assert 'EmbeddedResource Include="Examples\\**\\examples.json"' in csproj_text
 
 all_examples = list((root / "RevitAddin" / "Examples").glob("*/examples.json"))
 assert len(all_examples) == 4
-assert sum(len(json.loads(path.read_text(encoding="utf-8"))) for path in all_examples) == 40
+assert sum(len(json.loads(path.read_text(encoding="utf-8"))) for path in all_examples) == 101
+assert sum(1 for path in all_examples for item in json.loads(path.read_text(encoding="utf-8")) if item.get("version") == "1.8.3" and item.get("codeTemplate")) == 40
 
 solution_text = (root / "AuroraRevit.sln").read_text(encoding="utf-8")
 assert "AiProxy.Desktop\\AiProxy.Desktop.csproj" in solution_text
 
 workflow_text = (root / ".github" / "workflows" / "build-revit-addin.yml").read_text(encoding="utf-8")
-for marker in ["runs-on: windows-latest", "setup-dotnet@v4", "Publish AiProxy GUI self-contained", "upload-artifact@v4", "publish/AiProxyGui"]:
+for marker in ["runs-on: windows-latest", "setup-dotnet@v4", "Publish self-contained proxy desktop host", "upload-artifact@v4", "publish/AiProxyGui"]:
     assert marker in workflow_text, marker
 
 program_text = (root / "AiProxy" / "Program.cs").read_text(encoding="utf-8")
@@ -35,6 +36,6 @@ for source in (root / "AiProxy").glob("*.cs"):
 
 wpf_text = (root / "RevitAddin" / "AuroraDockablePaneControl.xaml.cs").read_text(encoding="utf-8")
 assert "Copy this Execution" in wpf_text
-assert "Clipboard.SetText(code)" in wpf_text
+assert "Clipboard.SetText(text" in wpf_text
 
-print("QA static validation passed: GUI, hardening, port fallback, CI, embedded resources, and copy-action UX.")
+print("QA static validation passed: GUI, hardening, port fallback, CI, 101 embedded examples, 40 educational templates, and copy-action UX.")

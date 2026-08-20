@@ -12,7 +12,6 @@
         <SolidColorBrush x:Key="PrimaryText" Color="#F4F7FB" />
         <SolidColorBrush x:Key="SecondaryText" Color="#97A3B6" />
         <SolidColorBrush x:Key="AccentBrush" Color="#7C8CFF" />
-
         <Style x:Key="RoundedButton" TargetType="{x:Type Button}">
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Background" Value="{StaticResource AccentBrush}" />
@@ -43,6 +42,13 @@
             <Setter Property="FontSize" Value="13" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
+        <Style x:Key="GalleryList" TargetType="{x:Type ListBox}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource PrimaryText}" />
+            <Setter Property="MaxHeight" Value="120" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        </Style>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource PanelBackground}">
@@ -71,21 +77,46 @@
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
             <Border Grid.Row="0" Padding="18,14" BorderBrush="{StaticResource SurfaceBorder}" BorderThickness="0,0,0,1">
                 <DockPanel>
-                    <Button Content="Command Bar" Click="CollapseChatButton_Click" Style="{StaticResource RoundedButton}" Background="#29356D" DockPanel.Dock="Right" />
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                        <Button x:Name="ThemeToggleButton" Content="Light Theme" Click="ThemeToggleButton_Click" Style="{StaticResource RoundedButton}" Background="#29356D" Margin="0,0,6,0" />
+                        <Button x:Name="FeedbackButton" Content="Copy Log" Click="FeedbackButton_Click" Style="{StaticResource RoundedButton}" Background="#29356D" Margin="0,0,6,0" />
+                        <Button Content="Command Bar" Click="CollapseChatButton_Click" Style="{StaticResource RoundedButton}" Background="#29356D" />
+                    </StackPanel>
                     <StackPanel>
                         <TextBlock Text="Aurora Assistant" Foreground="{StaticResource PrimaryText}" FontSize="15" FontWeight="SemiBold" />
-                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0"><Ellipse Width="7" Height="7" Fill="#54D69A" /><TextBlock Text="  Local proxy ready" Foreground="{StaticResource SecondaryText}" FontSize="11" /></StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0"><Ellipse Width="7" Height="7" Fill="#54D69A" /><TextBlock x:Name="ProxyStatusText" Text="  Local proxy ready" Foreground="{StaticResource SecondaryText}" FontSize="11" /></StackPanel>
                     </StackPanel>
                 </DockPanel>
             </Border>
             <ScrollViewer Grid.Row="1" x:Name="ChatScrollViewer" VerticalScrollBarVisibility="Auto" Padding="14,16,14,12"><StackPanel x:Name="ChatHistoryPanel" /></ScrollViewer>
             <Border Grid.Row="2" Background="#121823" BorderBrush="{StaticResource SurfaceBorder}" BorderThickness="0,1,0,0" Padding="12">
                 <Grid>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-                    <ComboBox x:Name="ExampleComboBox" Grid.Row="0" DisplayMemberPath="DisplayName" Foreground="{StaticResource PrimaryText}" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource SurfaceBorder}" Padding="8,7" FontSize="12" SelectionChanged="ExampleComboBox_SelectionChanged" Margin="0,0,0,8" />
-                    <Border Grid.Row="1" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource SurfaceBorder}" BorderThickness="1" CornerRadius="9"><TextBox x:Name="PromptTextBox" Style="{StaticResource InputTextBox}" MinHeight="44" MaxHeight="110" AcceptsReturn="True" TextWrapping="Wrap" KeyDown="PromptTextBox_KeyDown" /></Border>
-                    <Grid Grid.Row="2" Margin="0,9,0,0"><TextBlock Text="Enter to send  ·  Shift+Enter for a new line" Foreground="#69758A" FontSize="10" VerticalAlignment="Center" /><Button x:Name="SendButton" Content="Send  ›" HorizontalAlignment="Right" Click="SendButton_Click" Style="{StaticResource RoundedButton}" /></Grid>
-                    <Border x:Name="LoadingPanel" Grid.Row="2" Background="#1C2433" CornerRadius="8" Padding="10,7" HorizontalAlignment="Left" Visibility="Collapsed"><TextBlock Text="●  Loading..." Foreground="{StaticResource AccentBrush}" FontSize="11" /></Border>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                    <Border Grid.Row="0" Background="#1C2433" BorderBrush="{StaticResource SurfaceBorder}" BorderThickness="1" CornerRadius="9" Padding="10" Margin="0,0,0,9">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="Example Gallery" Foreground="{StaticResource PrimaryText}" FontSize="13" FontWeight="SemiBold" />
+                                <TextBlock Text="40 new v1.8.3 templates" DockPanel.Dock="Right" Foreground="{StaticResource AccentBrush}" FontSize="10" />
+                            </DockPanel>
+                            <TextBlock Text="Choose a discipline, then click a prompt to preview its runnable Revit API code and send it." Foreground="{StaticResource SecondaryText}" FontSize="10" Margin="0,3,0,7" TextWrapping="Wrap" />
+                            <TabControl x:Name="ExampleDisciplineTabs" Background="Transparent" BorderThickness="0" FontSize="11">
+                                <TabItem Header="Architecture"><ListBox x:Name="ArchitectureExamplesList" Style="{StaticResource GalleryList}" DisplayMemberPath="Title" SelectionChanged="ExampleList_SelectionChanged" /></TabItem>
+                                <TabItem Header="Structure"><ListBox x:Name="StructureExamplesList" Style="{StaticResource GalleryList}" DisplayMemberPath="Title" SelectionChanged="ExampleList_SelectionChanged" /></TabItem>
+                                <TabItem Header="MEP"><ListBox x:Name="MepExamplesList" Style="{StaticResource GalleryList}" DisplayMemberPath="Title" SelectionChanged="ExampleList_SelectionChanged" /></TabItem>
+                                <TabItem Header="General"><ListBox x:Name="GeneralExamplesList" Style="{StaticResource GalleryList}" DisplayMemberPath="Title" SelectionChanged="ExampleList_SelectionChanged" /></TabItem>
+                            </TabControl>
+                        </StackPanel>
+                    </Border>
+                    <Border x:Name="ExampleCodePanel" Grid.Row="1" Visibility="Collapsed" Background="#0D121A" BorderBrush="#405070" BorderThickness="1" CornerRadius="9" Padding="10" Margin="0,0,0,9">
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                            <DockPanel Grid.Row="0"><TextBlock Text="Educational Code Template" Foreground="{StaticResource AccentBrush}" FontSize="11" FontWeight="SemiBold" /><Button x:Name="CopyExampleCodeButton" Content="Copy Code" Click="CopyExampleCodeButton_Click" Style="{StaticResource RoundedButton}" Background="#29356D" Padding="9,5" DockPanel.Dock="Right" /></DockPanel>
+                            <TextBox x:Name="ExampleCodeTextBox" Grid.Row="1" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" MaxHeight="130" Background="Transparent" BorderThickness="0" Foreground="#D4DDF2" FontFamily="Consolas" FontSize="10" Margin="0,7,0,0" />
+                        </Grid>
+                    </Border>
+                    <Border Grid.Row="2" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource SurfaceBorder}" BorderThickness="1" CornerRadius="9"><TextBox x:Name="PromptTextBox" Style="{StaticResource InputTextBox}" MinHeight="44" MaxHeight="110" AcceptsReturn="True" TextWrapping="Wrap" KeyDown="PromptTextBox_KeyDown" /></Border>
+                    <Grid Grid.Row="3" Margin="0,9,0,0"><TextBlock Text="Enter to send  ·  Shift+Enter for a new line" Foreground="#69758A" FontSize="10" VerticalAlignment="Center" /><Button x:Name="SendButton" Content="Send  ›" HorizontalAlignment="Right" Click="SendButton_Click" Style="{StaticResource RoundedButton}" /></Grid>
+                    <Border x:Name="LoadingPanel" Grid.Row="4" Background="#1C2433" CornerRadius="8" Padding="10,7" HorizontalAlignment="Stretch" Visibility="Collapsed"><StackPanel><TextBlock Text="●  Aurora is thinking..." Foreground="{StaticResource AccentBrush}" FontSize="11" /><ProgressBar x:Name="ThinkingProgressBar" Height="4" IsIndeterminate="True" Foreground="{StaticResource AccentBrush}" Background="#293344" Margin="0,6,0,0" /></StackPanel></Border>
                 </Grid>
             </Border>
         </Grid>

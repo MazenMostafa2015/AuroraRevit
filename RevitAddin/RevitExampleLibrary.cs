@@ -12,6 +12,13 @@ namespace AuroraRevit.RevitAddin
         public string Discipline { get; set; }
         public string Title { get; set; }
         public string Prompt { get; set; }
+        public string CodeTemplate { get; set; }
+        public string Version { get; set; }
+
+        public bool HasCodeTemplate
+        {
+            get { return !string.IsNullOrWhiteSpace(CodeTemplate); }
+        }
 
         public string DisplayName
         {

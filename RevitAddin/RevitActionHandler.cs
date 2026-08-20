@@ -70,7 +70,11 @@ namespace AuroraRevit.RevitAddin
 
             try
             {
-                if (action.IsSelectAction)
+                if (action.IsScheduleAction)
+                {
+                    Complete(CreateSchedule(application, action.Category, action.Name));
+                }
+                else if (action.IsSelectAction)
                 {
                     Complete(SelectWalls(application, action.Query));
                 }
@@ -83,6 +87,74 @@ namespace AuroraRevit.RevitAddin
             {
                 Complete(RevitActionResult.Failure("Revit rejected the action: " + exception.Message));
             }
+        }
+
+        private RevitActionResult CreateSchedule(UIApplication application, string categoryName, string requestedName)
+        {
+            if (application == null || application.ActiveUIDocument == null)
+            {
+                return RevitActionResult.Failure("Open a Revit document before creating a schedule.");
+            }
+
+            ElementId categoryId;
+            if (!TryResolveScheduleCategory(categoryName, out categoryId))
+            {
+                return RevitActionResult.Failure("The schedule category is not supported. Try ducts, pipes, or cable_trays.");
+            }
+
+            var doc = application.ActiveUIDocument.Document;
+            var scheduleName = string.IsNullOrWhiteSpace(requestedName) ? categoryName + " Schedule" : requestedName.Trim();
+            using (Transaction tx = new Transaction(doc, "AI Action - Create Schedule"))
+            {
+                tx.Start();
+                var schedule = ViewSchedule.CreateSchedule(doc, categoryId);
+                schedule.Name = MakeUniqueScheduleName(doc, scheduleName);
+                tx.Commit();
+                return RevitActionResult.Success("Created schedule '" + schedule.Name + "' for " + categoryName + ".");
+            }
+        }
+
+        private static string MakeUniqueScheduleName(Document doc, string requestedName)
+        {
+            var names = new HashSet<string>(new FilteredElementCollector(doc).OfClass(typeof(ViewSchedule)).Cast<ViewSchedule>().Select(x => x.Name), StringComparer.OrdinalIgnoreCase);
+            if (!names.Contains(requestedName)) return requestedName;
+            var index = 2;
+            while (names.Contains(requestedName + " (" + index + ")")) index++;
+            return requestedName + " (" + index + ")";
+        }
+
+        private static bool TryResolveScheduleCategory(string value, out ElementId categoryId)
+        {
+            categoryId = ElementId.InvalidElementId;
+            var key = (value ?? string.Empty).Trim().ToLowerInvariant().Replace("-", "_").Replace(" ", "_");
+            BuiltInCategory category;
+            switch (key)
+            {
+                case "ducts": category = BuiltInCategory.OST_DuctCurves; break;
+                case "pipes": category = BuiltInCategory.OST_PipeCurves; break;
+                case "cable_trays": case "cabletray": category = BuiltInCategory.OST_CableTray; break;
+                case "walls": category = BuiltInCategory.OST_Walls; break;
+                case "doors": category = BuiltInCategory.OST_Doors; break;
+                case "windows": category = BuiltInCategory.OST_Windows; break;
+                case "rooms": category = BuiltInCategory.OST_Rooms; break;
+                case "floors": category = BuiltInCategory.OST_Floors; break;
+                case "ceilings": category = BuiltInCategory.OST_Ceilings; break;
+                case "mechanical_equipment": category = BuiltInCategory.OST_MechanicalEquipment; break;
+                case "air_terminals": category = BuiltInCategory.OST_MechanicalEquipment; break;
+                case "electrical_equipment": category = BuiltInCategory.OST_ElectricalEquipment; break;
+                case "lighting_fixtures": category = BuiltInCategory.OST_LightingFixtures; break;
+                case "plumbing_fixtures": category = BuiltInCategory.OST_PlumbingFixtures; break;
+                case "structural_framing": category = BuiltInCategory.OST_StructuralFraming; break;
+                case "structural_columns": case "columns": category = BuiltInCategory.OST_StructuralColumns; break;
+                case "structural_foundations": category = BuiltInCategory.OST_StructuralFoundation; break;
+                case "rebar": category = BuiltInCategory.OST_Rebar; break;
+                case "sheets": category = BuiltInCategory.OST_Sheets; break;
+                case "areas": category = BuiltInCategory.OST_Areas; break;
+                case "revisions": category = BuiltInCategory.OST_Revisions; break;
+                default: return false;
+            }
+            categoryId = new ElementId(category);
+            return true;
         }
 
         public string GetName()

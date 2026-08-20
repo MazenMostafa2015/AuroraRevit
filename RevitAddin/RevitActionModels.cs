@@ -10,6 +10,13 @@ namespace AuroraRevit.RevitAddin
         public string Type { get; set; }
         public string Query { get; set; }
         public string Content { get; set; }
+        public string Category { get; set; }
+        public string Name { get; set; }
+
+        public bool IsScheduleAction
+        {
+            get { return string.Equals(Type, "schedule", StringComparison.OrdinalIgnoreCase); }
+        }
 
         public bool IsSelectAction
         {
@@ -89,10 +96,12 @@ namespace AuroraRevit.RevitAddin
                     {
                         Type = typeProperty.GetString(),
                         Query = ReadString(root, "query"),
-                        Content = ReadString(root, "content")
+                        Content = ReadString(root, "content"),
+                        Category = ReadString(root, "category"),
+                        Name = ReadString(root, "name")
                     };
 
-                    return action.IsSelectAction || action.IsCodeAction;
+                    return action.IsSelectAction || action.IsCodeAction || action.IsScheduleAction;
                 }
             }
             catch (JsonException)

@@ -62,5 +62,65 @@
   {
     "title": "Create System for Selected Air Terminals",
     "prompt": "Create a new mechanical system for the selected air terminals."
+  },
+  {
+    "title": "Create a Duct Schedule",
+    "prompt": "Create a schedule named M-DUCT for all ducts with size, system, and length fields.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Duct Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_DuctCurves);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"M-DUCT\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Cable Tray Schedule",
+    "prompt": "Create a schedule named E-CABLETRAY for cable trays.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Cable Tray Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_CableTray);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"E-CABLETRAY\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Select All Pipes",
+    "prompt": "Select every pipe instance in the active project.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Select All Pipes\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_PipeCurves);\n    var pipes = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_PipeCurves).WhereElementIsNotElementType().ToElementIds();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Duct Insulation Schedule",
+    "prompt": "Create a schedule named M-DUCT-INSULATION for duct insulation elements.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Duct Insulation Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_DuctInsulations);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"M-DUCT-INSULATION\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Find Unconnected Duct Ends",
+    "prompt": "Find ducts with open connectors that are not connected to another element.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Find Unconnected Duct Ends\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_DuctCurves);\n    var ducts = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_DuctCurves).WhereElementIsNotElementType().ToElements();\n    var openDucts = ducts.Where(x => (x as MEPCurve)?.ConnectorManager?.Connectors.Cast<Connector>().Any(c => !c.IsConnected) == true).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Count Fire Dampers",
+    "prompt": "Count all fire damper mechanical equipment in the active model.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Count Fire Dampers\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_MechanicalEquipment);\n    var dampers = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_MechanicalEquipment).WhereElementIsNotElementType().Where(x => x.Name.IndexOf(\"fire damper\", StringComparison.OrdinalIgnoreCase) >= 0).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create an Electrical Equipment Schedule",
+    "prompt": "Create a schedule named E-EQUIPMENT for electrical equipment.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create an Electrical Equipment Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_ElectricalEquipment);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"E-EQUIPMENT\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "List Air Terminals by Flow",
+    "prompt": "List air terminals in the active model and read their flow values.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: List Air Terminals by Flow\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_MechanicalEquipment);\n    var terminals = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_MechanicalEquipment).WhereElementIsNotElementType().ToElements();\n    var flowValues = terminals.Select(x => x.LookupParameter(\"Flow\")?.AsDouble()).ToList();\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create an MEP Coordination 3D View",
+    "prompt": "Create a 3D view named MEP Coordination for multidisciplinary coordination.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create an MEP Coordination 3D View\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_DuctCurves);\n    var viewType = new FilteredElementCollector(doc).OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>().FirstOrDefault(x => x.ViewFamily == ViewFamily.ThreeDimensional);\n    if (viewType == null) return;\n    var view = View3D.CreateIsometric(doc, viewType.Id);\n    view.Name = \"MEP Coordination\";\n}",
+    "version": "1.8.3"
+  },
+  {
+    "title": "Create a Pipe Schedule",
+    "prompt": "Create a schedule named P-PIPE for all pipe segments.",
+    "codeTemplate": "using System;\nusing Autodesk.Revit.DB;\nusing System.Linq;\n\n// AuroraRevit v1.8.3 educational template: Create a Pipe Schedule\n// This template is intentionally read-only or creates a single named view/schedule.\npublic static void Run(Document doc)\n{\n    var category = new ElementId(BuiltInCategory.OST_PipeCurves);\n    var schedule = ViewSchedule.CreateSchedule(doc, category);\n    schedule.Name = \"P-PIPE\";\n}",
+    "version": "1.8.3"
   }
 ]

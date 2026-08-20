@@ -1,24 +1,21 @@
 from pathlib import Path
 import json
-import yaml
 
 root = Path(__file__).parent
 workflow_path = root / ".github" / "workflows" / "build-revit-addin.yml"
-workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
-assert "jobs" in workflow and "build" in workflow["jobs"]
-job = workflow["jobs"]["build"]
-assert job["runs-on"] == "windows-latest"
-step_names = [step.get("name", "") for step in job["steps"]]
+workflow_text = workflow_path.read_text(encoding="utf-8")
 for required in [
-    "Checkout repository",
-    "Setup .NET 8 for AiProxy",
-    "Restore solution",
-    "Build solution in Release mode",
-    "Publish AiProxy self-contained for win-x64",
-    "Generate matching Revit manifest",
-    "Upload Revit add-in and AiProxy artifacts",
+    "jobs:",
+    "build:",
+    "installer:",
+    "runs-on: windows-latest",
+    "choco install innosetup",
+    "ISCC.exe",
+    "AuroraRevit-Setup.exe",
+    "actions/upload-artifact@v4",
+    "files: release-assets/AuroraRevit-Setup.exe",
 ]:
-    assert required in step_names, required
+    assert required in workflow_text, required
 
 csproj = (root / "RevitAddin" / "RevitAddin.csproj").read_text(encoding="utf-8")
 assert "<Reference Include=\"RevitAPI\">" not in csproj
@@ -27,10 +24,15 @@ for package in ["Nice3point.Revit.Api.RevitAPI", "Nice3point.Revit.Api.RevitAPIU
     assert package in csproj
 
 count = 0
+new_count = 0
 for path in sorted((root / "RevitAddin" / "Examples").glob("*/examples.json")):
     entries = json.loads(path.read_text(encoding="utf-8"))
-    assert len(entries) == 10, path
-    assert all(set(entry) == {"title", "prompt"} for entry in entries)
+    assert len(entries) >= 20, path
+    assert sum(1 for entry in entries if entry.get("version") == "1.8.3") == 10
+    assert all(set(entry).issubset({"title", "prompt", "codeTemplate", "version"}) for entry in entries)
+    assert all(entry.get("codeTemplate", "").strip() for entry in entries if entry.get("version") == "1.8.3")
     count += len(entries)
-assert count == 40
-print("CI configuration validated: Windows job, required steps, Revit packages, and 40 examples preserved.")
+    new_count += sum(1 for entry in entries if entry.get("version") == "1.8.3")
+assert count == 101
+assert new_count == 40
+print("CI configuration validated: Windows payload jobs, Inno Setup installer, Revit packages, 101 examples, and 40 educational templates.")
