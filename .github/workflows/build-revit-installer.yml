@@ -1,0 +1,181 @@
+name: Build Revit Add-in Installer
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Create a GitHub release for this run'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  CONFIGURATION: Release
+
+jobs:
+  build:
+    name: Build Revit ${{ matrix.revit-version }} installer
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        revit-version: ['2023', '2024', '2025']
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore solution
+        shell: pwsh
+        run: >-
+          dotnet restore AuroraRevit.sln
+          -p:RevitVersion=${{ matrix.revit-version }}
+          -r win-x64
+
+      - name: Build Revit add-in
+        shell: pwsh
+        run: >-
+          dotnet build RevitAddin/RevitAddin.csproj
+          --configuration $env:CONFIGURATION
+          --no-restore
+          -p:RevitVersion=${{ matrix.revit-version }}
+
+      - name: Publish self-contained AiProxy
+        shell: pwsh
+        run: >-
+          dotnet publish AiProxy/AiProxy.csproj
+          --configuration $env:CONFIGURATION
+          --runtime win-x64
+          --self-contained true
+          --no-restore
+          --output publish/AiProxy
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:PublishTrimmed=false
+
+      - name: Publish self-contained proxy desktop host
+        shell: pwsh
+        run: >-
+          dotnet publish AiProxy.Desktop/AiProxy.Desktop.csproj
+          --configuration $env:CONFIGURATION
+          --runtime win-x64
+          --self-contained true
+          --no-restore
+          --output publish/AiProxyGui
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:PublishTrimmed=false
+
+      - name: Generate matching Revit manifest
+        shell: pwsh
+        env:
+          REVT_VERSION: ${{ matrix.revit-version }}
+        run: >-
+          ./RevitAddin/Generate-RevitManifests.ps1
+          -AssemblyPath "$env:GITHUB_WORKSPACE/Release/RevitAddin/AuroraRevit.RevitAddin.dll"
+          -OutputRoot "$env:GITHUB_WORKSPACE/publish/Manifests"
+          -Versions $env:REVT_VERSION
+
+      - name: Stage installer package
+        shell: pwsh
+        env:
+          REVT_VERSION: ${{ matrix.revit-version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $stage = Join-Path $env:GITHUB_WORKSPACE "installer-stage\Revit$env:REVT_VERSION"
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          New-Item -ItemType Directory -Path (Join-Path $stage 'Release\RevitAddin') -Force | Out-Null
+          New-Item -ItemType Directory -Path (Join-Path $stage 'publish\AiProxy') -Force | Out-Null
+          New-Item -ItemType Directory -Path (Join-Path $stage 'publish\AiProxyGui') -Force | Out-Null
+          $manifestStage = Join-Path $stage ('publish\Manifests\Revit' + $env:REVT_VERSION)
+          New-Item -ItemType Directory -Path $manifestStage -Force | Out-Null
+
+          Copy-Item 'Release\RevitAddin\*' (Join-Path $stage 'Release\RevitAddin') -Recurse -Force
+          Copy-Item 'publish\AiProxy\*' (Join-Path $stage 'publish\AiProxy') -Recurse -Force
+          Copy-Item 'publish\AiProxyGui\*' (Join-Path $stage 'publish\AiProxyGui') -Recurse -Force
+          Copy-Item (Join-Path (Join-Path 'publish\Manifests' ('Revit' + $env:REVT_VERSION)) 'AuroraRevit.addin') $manifestStage -Force
+          Copy-Item 'Setup-AuroraRevit.ps1' $stage -Force
+          Copy-Item 'Start-AuroraRevit.ps1' $stage -Force
+          Copy-Item 'README.md' $stage -Force
+
+          @'
+          @echo off
+          setlocal
+          powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0Setup-AuroraRevit.ps1" -PackagePath "%~dp0AuroraRevit-Release.zip" -RevitVersion REPLACE_VERSION %*
+          if errorlevel 1 (
+            echo AuroraRevit setup failed.
+            pause
+            exit /b 1
+          )
+          echo AuroraRevit setup completed successfully.
+          pause
+          '@.Replace('REPLACE_VERSION', $env:REVT_VERSION) | Set-Content (Join-Path $stage 'AuroraRevit-Setup.cmd') -Encoding ASCII
+
+          @'
+          AuroraRevit Windows Installer Package
+          =====================================
+
+          Run AuroraRevit-Setup.cmd on 64-bit Windows. It installs the add-in for the current
+          user under %LOCALAPPDATA%\AuroraRevit and writes the matching Revit manifest under
+          %APPDATA%\Autodesk\Revit\Addins\REPLACE_VERSION.
+
+          The package contains the compiled Revit add-in, self-contained AiProxy executables,
+          the proxy startup script, and the local setup script.
+          '@.Replace('REPLACE_VERSION', $env:REVT_VERSION) | Set-Content (Join-Path $stage 'SETUP-README.txt') -Encoding UTF8
+
+      - name: Create release archive
+        shell: pwsh
+        env:
+          REVT_VERSION: ${{ matrix.revit-version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $stage = Join-Path $env:GITHUB_WORKSPACE "installer-stage\Revit$env:REVT_VERSION"
+          $archive = Join-Path $env:GITHUB_WORKSPACE "AuroraRevit-Installer-Revit$env:REVT_VERSION.zip"
+          Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $archive -Force
+          Copy-Item $archive (Join-Path $stage 'AuroraRevit-Release.zip') -Force
+          Remove-Item $archive -Force
+          Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $archive -Force
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AuroraRevit-Installer-Revit${{ matrix.revit-version }}
+          if-no-files-found: error
+          retention-days: 30
+          path: AuroraRevit-Installer-Revit${{ matrix.revit-version }}.zip
+
+  release:
+    name: Publish GitHub release assets
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish_release)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download installer artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: AuroraRevit-Installer-Revit*
+          merge-multiple: true
+          path: release-assets
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('build-{0}', github.run_number) }}
+          generate_release_notes: true
+          files: release-assets/*.zip

@@ -10,11 +10,13 @@ starts the local Aurora proxy when it is not already healthy.
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('2025')]
+    [ValidateSet('2023', '2024', '2025')]
     [string]$RevitVersion = '2025',
 
     [ValidatePattern('^v\d+\.\d+\.\d+$')]
     [string]$ReleaseTag = 'v1.0.0',
+
+    [string]$PackagePath,
 
     [string]$OpenAiApiKey,
 
@@ -68,24 +70,36 @@ try {
     $extractRoot = Join-Path $temporaryRoot 'extracted'
 
     Write-Info "Preparing AuroraRevit $ReleaseTag for Revit $RevitVersion."
+    if (-not [string]::IsNullOrWhiteSpace($PackagePath)) {
+        $PackagePath = [IO.Path]::GetFullPath($PackagePath)
+        if (-not (Test-Path -LiteralPath $PackagePath)) {
+            throw "The local package was not found: $PackagePath"
+        }
+        Write-Info "Using local package: $PackagePath"
+    }
 
     $revitExecutable = Join-Path ${env:ProgramFiles} "Autodesk\Revit $RevitVersion\Revit.exe"
     if (-not (Test-Path $revitExecutable)) {
         Write-Warning "Revit $RevitVersion was not found at the standard path. The add-in will still be installed for this Revit version."
     }
 
-    try {
-        Invoke-WebRequest -Uri 'https://github.com' -UseBasicParsing -TimeoutSec 10 | Out-Null
-    }
-    catch {
-        throw 'GitHub could not be reached. Check your network or proxy connection and run the setup again.'
-    }
-
     New-Item -ItemType Directory -Path $temporaryRoot -Force | Out-Null
-    Write-Info 'Downloading the published AuroraRevit release.'
-    Invoke-WebRequest -Uri $downloadUrl -OutFile $archivePath -UseBasicParsing
-    if (-not (Test-Path $archivePath) -or (Get-Item $archivePath).Length -lt 1MB) {
-        throw "The release asset was not downloaded successfully: $downloadUrl"
+    if ([string]::IsNullOrWhiteSpace($PackagePath)) {
+        try {
+            Invoke-WebRequest -Uri 'https://github.com' -UseBasicParsing -TimeoutSec 10 | Out-Null
+        }
+        catch {
+            throw 'GitHub could not be reached. Pass -PackagePath with a local AuroraRevit release archive, or check the network and run setup again.'
+        }
+
+        Write-Info 'Downloading the published AuroraRevit release.'
+        Invoke-WebRequest -Uri $downloadUrl -OutFile $archivePath -UseBasicParsing
+        if (-not (Test-Path $archivePath) -or (Get-Item $archivePath).Length -lt 1MB) {
+            throw "The release asset was not downloaded successfully: $downloadUrl"
+        }
+    }
+    else {
+        Copy-Item -LiteralPath $PackagePath -Destination $archivePath -Force
     }
 
     Write-Info 'Extracting the release package.'

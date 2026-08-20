@@ -23,6 +23,41 @@ namespace AuroraRevit.RevitAddin
             AddAssistantMessage("Hello. I’m Aurora, your Revit AI Assistant. Ask me a question to test the local proxy connection.");
         }
 
+        private async void CompactSendButton_Click(object sender, RoutedEventArgs e)
+        {
+            PromptTextBox.Text = CompactPromptTextBox.Text;
+            CompactPromptTextBox.Clear();
+            await SendPromptAsync();
+        }
+
+        private async void CompactPromptTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
+                PromptTextBox.Text = CompactPromptTextBox.Text;
+                CompactPromptTextBox.Clear();
+                await SendPromptAsync();
+            }
+        }
+
+        private void ExpandChatButton_Click(object sender, RoutedEventArgs e)
+        {
+            CompactBar.Visibility = Visibility.Collapsed;
+            ExpandedChatView.Visibility = Visibility.Visible;
+            MinHeight = 420;
+            CompactPromptTextBox.Clear();
+            PromptTextBox.Focus();
+        }
+
+        private void CollapseChatButton_Click(object sender, RoutedEventArgs e)
+        {
+            ExpandedChatView.Visibility = Visibility.Collapsed;
+            CompactBar.Visibility = Visibility.Visible;
+            MinHeight = 50;
+            CompactPromptTextBox.Focus();
+        }
+
         private void LoadExampleLibrary()
         {
             try
@@ -66,7 +101,7 @@ namespace AuroraRevit.RevitAddin
         private async System.Threading.Tasks.Task SendPromptAsync()
         {
             var prompt = PromptTextBox.Text.Trim();
-            if (string.IsNullOrWhiteSpace(prompt) || !SendButton.IsEnabled)
+            if (string.IsNullOrWhiteSpace(prompt) || !SendButton.IsEnabled || !CompactSendButton.IsEnabled)
             {
                 return;
             }
@@ -107,6 +142,8 @@ namespace AuroraRevit.RevitAddin
                 {
                     await HandleStreamedResponseAsync(streamedJson.ToString(), assistantBubble);
                 }
+
+                ShowToast(assistantBubble.Text);
             }
             catch (OperationCanceledException)
             {
@@ -117,6 +154,7 @@ namespace AuroraRevit.RevitAddin
                 SetMessageText(
                     assistantBubble,
                     "I couldn’t reach the streaming Aurora proxy. Start AiProxy on http://localhost:5000 and try again.\n\n" + exception.Message);
+                ShowToast(assistantBubble.Text);
             }
             finally
             {
@@ -278,6 +316,31 @@ namespace AuroraRevit.RevitAddin
             LoadingPanel.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
             SendButton.IsEnabled = !isLoading;
             PromptTextBox.IsEnabled = !isLoading;
+            CompactSendButton.IsEnabled = !isLoading;
+            CompactPromptTextBox.IsEnabled = !isLoading;
+            CompactStatusDot.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isLoading ? "#F0B95A" : "#54D69A"));
+            CompactStatusText.Text = isLoading ? "Working..." : "Ready";
+        }
+
+        private void ShowToast(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            ToastText.Text = text.Trim();
+            ToastBorder.Visibility = Visibility.Visible;
+            var timer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(8)
+            };
+            timer.Tick += (sender, args) =>
+            {
+                ToastBorder.Visibility = Visibility.Collapsed;
+                timer.Stop();
+            };
+            timer.Start();
         }
 
         private void AddUserMessage(string text)

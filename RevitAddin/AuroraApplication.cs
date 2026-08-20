@@ -44,7 +44,7 @@ namespace AuroraRevit.RevitAddin
             data.FrameworkElement = new AuroraDockablePaneControl();
             data.InitialState = new DockablePaneState
             {
-                DockPosition = DockPosition.Right
+                DockPosition = DockPosition.Bottom
             };
         }
     }
