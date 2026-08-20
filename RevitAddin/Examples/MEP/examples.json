@@ -38,5 +38,9 @@
   {
     "title": "Check MEP Clearance Conflicts",
     "prompt": "Check all MEP elements for clearance conflicts with structural beams."
+  },
+  {
+    "title": "Count All HVAC Ducts",
+    "prompt": "Count all HVAC ducts in the active project."
   }
 ]

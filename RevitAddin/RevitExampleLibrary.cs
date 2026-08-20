@@ -50,10 +50,10 @@ namespace AuroraRevit.RevitAddin
                 {
                     var disciplineExamples = JsonSerializer.Deserialize<List<RevitExample>>(
                         reader.ReadToEnd(), JsonOptions);
-                    if (disciplineExamples == null || disciplineExamples.Count != 10)
+                    if (disciplineExamples == null || disciplineExamples.Count < 10)
                     {
                         throw new InvalidOperationException(
-                            $"The {discipline} example library must contain exactly 10 prompts.");
+                            $"The {discipline} example library must contain at least 10 prompts.");
                     }
 
                     foreach (var example in disciplineExamples)

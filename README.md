@@ -2,6 +2,28 @@
 
 An AI Assistant Add-in for Autodesk Revit 2023, 2024, and 2025 with 40 built-in discipline examples.
 
+## One-step installer for published releases
+
+For a standard per-user installation from a published AuroraRevit release, review
+or download `Setup-AuroraRevit.ps1` from this repository and run it from Windows
+PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Setup-AuroraRevit.ps1 -RevitVersion 2025
+```
+
+The setup script downloads the selected Revit 2025 release asset (default `v1.0.0`), deploys
+the add-in and local proxy below `%LOCALAPPDATA%\\AuroraRevit`, creates a per-user
+manifest in `%APPDATA%\\Autodesk\\Revit\\Addins\\<year>`, optionally saves the OpenAI
+proxy configuration for the current Windows user, and starts the local proxy. It
+does not require Administrator rights. The currently published installer targets
+**Revit 2025**; build the appropriate version-specific release from source before
+deploying AuroraRevit to Revit 2023 or 2024.
+
+> Review the script before running it. The proxy requires an OpenAI API key to
+> process AI queries. You may provide it securely when prompted, pass
+> `-OpenAiApiKey`, or configure `OpenAI__ApiKey` later for the current user.
+
 This solution uses the Aurora Relay pattern: a Revit add-in communicates with a local .NET 8 ASP.NET Core proxy over HTTP/SSE. The proxy calls OpenAI through the official `OpenAI` NuGet package and normalizes model output into the typed JSON action contract consumed by the add-in.
 
 ## Solution layout
@@ -149,9 +171,9 @@ For a normal user installation, use the per-user path and copy the matching mani
 
 ## Example Library
 
-The RevitAddin includes an embedded Example Library under `RevitAddin\\Examples` with four discipline folders: `Architecture`, `Structure`, `MEP`, and `General`. Each folder contains an `examples.json` file with exactly 10 objects shaped as `{ "title": "Example Title", "prompt": "The actual prompt text for the AI" }`.
+The RevitAddin includes an embedded Example Library under `RevitAddin\\Examples` with four discipline folders: `Architecture`, `Structure`, `MEP`, and `General`. Each folder contains an `examples.json` file with at least 10 objects shaped as `{ "title": "Example Title", "prompt": "The actual prompt text for the AI" }`. The MEP catalog includes **Count All HVAC Ducts**, which fills the prompt box with `Count all HVAC ducts in the active project.`.
 
-The WPF panel loads all 40 examples from assembly resources at startup. The ComboBox displays them as `[Discipline] - [Title]`; selecting an item copies its associated `prompt` into the existing input TextBox. The existing chat history, send button, loading behavior, SSE streaming, and action execution remain unchanged.
+The WPF panel loads all embedded examples from assembly resources at startup. The ComboBox displays them as `[Discipline] - [Title]`; selecting an item copies its associated `prompt` into the existing input TextBox. The existing chat history, send button, loading behavior, SSE streaming, and action execution remain unchanged.
 
 ## Reusable skill
 
