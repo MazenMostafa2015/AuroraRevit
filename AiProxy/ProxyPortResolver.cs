@@ -8,7 +8,7 @@ public static class ProxyPortResolver
 {
     public static string ResolveUrl(string[] args)
     {
-        var requestedUrl = GetRequestedUrl(args) ?? "http://localhost:5000";
+        var requestedUrl = GetRequestedUrl(args) ?? "http://localhost:5001";
         if (!Uri.TryCreate(requestedUrl, UriKind.Absolute, out var requestedUri))
         {
             throw new InvalidOperationException($"Invalid proxy URL: {requestedUrl}");
@@ -19,14 +19,15 @@ public static class ProxyPortResolver
             return requestedUrl.TrimEnd('/');
         }
 
-        var fallback = new UriBuilder(requestedUri) { Port = 5001 }.Uri.ToString().TrimEnd('/');
-        if (IsPortAvailable(5001))
+        var fallbackPort = requestedUri.Port == 5001 ? 5000 : 5001;
+        var fallback = new UriBuilder(requestedUri) { Port = fallbackPort }.Uri.ToString().TrimEnd('/');
+        if (IsPortAvailable(fallbackPort))
         {
             return fallback;
         }
 
         throw new InvalidOperationException(
-            $"Ports {requestedUri.Port} and 5001 are unavailable. Stop the conflicting process and retry.");
+            $"Ports {requestedUri.Port} and {fallbackPort} are unavailable. Stop the conflicting process and retry.");
     }
 
     private static string? GetRequestedUrl(string[] args)

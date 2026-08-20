@@ -379,7 +379,7 @@ namespace AuroraRevit.RevitAddin
             if (value.IndexOf("401", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("api key", StringComparison.OrdinalIgnoreCase) >= 0)
                 return "Aurora could not authenticate with the AI provider. Check the OpenAI API key in the local proxy settings, then try again.";
             if (value.IndexOf("localhost", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("connection", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "Aurora cannot reach the local proxy. Start AiProxy or Aurora Proxy GUI on port 5000, then try again.";
+                return "Aurora cannot reach the local proxy. Start Aurora Revit Proxy and verify its Running endpoint on port 5001 (the add-in also checks port 5000).";
             return "Aurora could not complete that request. Review the prompt and active Revit document, then try again.\n\nDetails: " + value;
         }
 

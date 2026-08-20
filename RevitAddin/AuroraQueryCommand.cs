@@ -38,8 +38,13 @@ namespace AuroraRevit.RevitAddin
 
     public sealed class AuroraProxyClient
     {
-        private const string Endpoint = "http://localhost:5000/api/revit-query";
-        private const string StreamEndpoint = "http://localhost:5000/api/revit-query/stream";
+        private static readonly string[] ProxyBaseUrls =
+        {
+            "http://localhost:5001",
+            "http://localhost:5000"
+        };
+        private const string QueryPath = "/api/revit-query";
+        private const string StreamQueryPath = "/api/revit-query/stream";
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -47,6 +52,7 @@ namespace AuroraRevit.RevitAddin
         };
 
         private readonly HttpClient _httpClient;
+        private string _activeBaseUrl;
 
         public AuroraProxyClient()
         {
@@ -64,8 +70,9 @@ namespace AuroraRevit.RevitAddin
             }
 
             var payload = JsonSerializer.Serialize(new RevitQueryRequest { Prompt = prompt }, JsonOptions);
+            var endpoint = (await ResolveBaseUrlAsync().ConfigureAwait(false)) + QueryPath;
             using (var content = new StringContent(payload, Encoding.UTF8, "application/json"))
-            using (var response = await _httpClient.PostAsync(Endpoint, content).ConfigureAwait(false))
+            using (var response = await _httpClient.PostAsync(endpoint, content).ConfigureAwait(false))
             {
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
@@ -76,6 +83,40 @@ namespace AuroraRevit.RevitAddin
 
                 return DeserializeResponse(json);
             }
+        }
+
+        private async Task<string> ResolveBaseUrlAsync()
+        {
+            if (!string.IsNullOrWhiteSpace(_activeBaseUrl))
+            {
+                return _activeBaseUrl;
+            }
+
+            foreach (var baseUrl in ProxyBaseUrls)
+            {
+                try
+                {
+                    using (var response = await _httpClient.GetAsync(baseUrl + "/health").ConfigureAwait(false))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            _activeBaseUrl = baseUrl;
+                            return baseUrl;
+                        }
+                    }
+                }
+                catch (HttpRequestException)
+                {
+                    // Try the alternate local proxy port.
+                }
+                catch (TaskCanceledException)
+                {
+                    // Try the alternate local proxy port.
+                }
+            }
+
+            throw new InvalidOperationException(
+                "Aurora proxy is not reachable on localhost:5001 or localhost:5000. Start Aurora Revit Proxy and verify its Running endpoint.");
         }
 
         public RevitQueryResponse DeserializeResponse(string json)
@@ -106,7 +147,8 @@ namespace AuroraRevit.RevitAddin
             }
 
             var payload = JsonSerializer.Serialize(new RevitQueryRequest { Prompt = prompt }, JsonOptions);
-            using (var request = new HttpRequestMessage(HttpMethod.Post, StreamEndpoint))
+            var endpoint = (await ResolveBaseUrlAsync().ConfigureAwait(false)) + StreamQueryPath;
+            using (var request = new HttpRequestMessage(HttpMethod.Post, endpoint))
             using (var content = new StringContent(payload, Encoding.UTF8, "application/json"))
             {
                 request.Content = content;
