@@ -1,6 +1,6 @@
 #define MyAppName "AuroraRevit AI Assistant"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.8.3"
+  #define MyAppVersion "1.8.4"
 #endif
 
 [Setup]
@@ -25,12 +25,12 @@ Uninstallable=yes
 [Files]
 Source: "payload\common\AiProxyGui\*"; DestDir: "{app}\AiProxyGui"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\common\AiProxy\*"; DestDir: "{app}\AiProxy"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "payload\Revit2023\Release\RevitAddin\AuroraRevit.RevitAddin.dll"; DestDir: "{app}\Payload\Revit2023"; Flags: ignoreversion
-Source: "payload\Revit2023\publish\Manifests\Revit2023\AuroraRevit.addin"; DestDir: "{app}\Payload\Revit2023"; Flags: ignoreversion
-Source: "payload\Revit2024\Release\RevitAddin\AuroraRevit.RevitAddin.dll"; DestDir: "{app}\Payload\Revit2024"; Flags: ignoreversion
-Source: "payload\Revit2024\publish\Manifests\Revit2024\AuroraRevit.addin"; DestDir: "{app}\Payload\Revit2024"; Flags: ignoreversion
-Source: "payload\Revit2025\Release\RevitAddin\AuroraRevit.RevitAddin.dll"; DestDir: "{app}\Payload\Revit2025"; Flags: ignoreversion
-Source: "payload\Revit2025\publish\Manifests\Revit2025\AuroraRevit.addin"; DestDir: "{app}\Payload\Revit2025"; Flags: ignoreversion
+Source: "payload\Revit2023\Release\RevitAddin\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2023"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRevit2023Installed
+Source: "payload\Revit2023\publish\Manifests\Revit2023\AuroraRevit.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2023"; DestName: "AuroraRevit.addin"; Flags: ignoreversion; Check: IsRevit2023Installed
+Source: "payload\Revit2024\Release\RevitAddin\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2024"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRevit2024Installed
+Source: "payload\Revit2024\publish\Manifests\Revit2024\AuroraRevit.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2024"; DestName: "AuroraRevit.addin"; Flags: ignoreversion; Check: IsRevit2024Installed
+Source: "payload\Revit2025\Release\RevitAddin\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2025"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRevit2025Installed
+Source: "payload\Revit2025\publish\Manifests\Revit2025\AuroraRevit.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2025"; DestName: "AuroraRevit.addin"; Flags: ignoreversion; Check: IsRevit2025Installed
 
 [Icons]
 Name: "{autodesktop}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
@@ -46,16 +46,31 @@ var
 
 function RevitInstallPath(Year: String): String;
 begin
-  Result := ExpandConstant('{autopf}') + '\\Autodesk\\Revit ' + Year + '\\Revit.exe';
+  Result := ExpandConstant('{autopf}') + '\Autodesk\Revit ' + Year + '\Revit.exe';
 end;
 
 function IsRevitYearInstalled(Year: String): Boolean;
 begin
   Result := FileExists(RevitInstallPath(Year))
-    or RegKeyExists(HKLM64, 'SOFTWARE\\Autodesk\\Revit\\Autodesk Revit ' + Year)
-    or RegKeyExists(HKLM64, 'SOFTWARE\\Autodesk\\Revit\\' + Year)
-    or RegKeyExists(HKCU, 'SOFTWARE\\Autodesk\\Revit\\Autodesk Revit ' + Year)
-    or RegKeyExists(HKCU, 'SOFTWARE\\Autodesk\\Revit\\' + Year);
+    or RegKeyExists(HKLM64, 'SOFTWARE\Autodesk\Revit\Autodesk Revit ' + Year)
+    or RegKeyExists(HKLM64, 'SOFTWARE\Autodesk\Revit\' + Year)
+    or RegKeyExists(HKCU, 'SOFTWARE\Autodesk\Revit\Autodesk Revit ' + Year)
+    or RegKeyExists(HKCU, 'SOFTWARE\Autodesk\Revit\' + Year);
+end;
+
+function IsRevit2023Installed(): Boolean;
+begin
+  Result := IsRevitYearInstalled('2023');
+end;
+
+function IsRevit2024Installed(): Boolean;
+begin
+  Result := IsRevitYearInstalled('2024');
+end;
+
+function IsRevit2025Installed(): Boolean;
+begin
+  Result := IsRevitYearInstalled('2025');
 end;
 
 function DetectInstalledYears(): String;
@@ -105,30 +120,23 @@ end;
 
 procedure InstallRevitFiles(Year: String);
 var
-  SourceRoot: String;
   AddinDirectory: String;
-  AssemblySource: String;
-  ManifestSource: String;
-  AssemblyDestination: String;
   ManifestDestination: String;
+  AssemblyDestination: String;
   ManifestContent: AnsiString;
 begin
-  SourceRoot := ExpandConstant('{app}\Payload\Revit' + Year);
   AddinDirectory := ExpandConstant('{userappdata}\Autodesk\Revit\Addins\' + Year);
   ForceDirectories(AddinDirectory);
+  AssemblyDestination := AddinDirectory + '\AuroraRevit.RevitAddin.dll';
+  ManifestDestination := AddinDirectory + '\AuroraRevit.addin';
 
-  AssemblySource := SourceRoot + '\\AuroraRevit.RevitAddin.dll';
-  ManifestSource := SourceRoot + '\\AuroraRevit.addin';
-  AssemblyDestination := AddinDirectory + '\\AuroraRevit.RevitAddin.dll';
-  ManifestDestination := AddinDirectory + '\\AuroraRevit.addin';
-
-  if not CopyFile(AssemblySource, AssemblyDestination, False) then
-    RaiseException('Could not install the AuroraRevit add-in assembly for Revit ' + Year + '.');
-  if not LoadStringFromFile(ManifestSource, ManifestContent) then
+  if not FileExists(AssemblyDestination) then
+    RaiseException('The AuroraRevit add-in files were not copied for Revit ' + Year + '.');
+  if not LoadStringFromFile(ManifestDestination, ManifestContent) then
     RaiseException('Could not read the AuroraRevit manifest for Revit ' + Year + '.');
   ManifestContent := ReplaceAssemblyPath(ManifestContent, AssemblyDestination);
   if not SaveStringToFile(ManifestDestination, ManifestContent, False) then
-    RaiseException('Could not install the AuroraRevit manifest for Revit ' + Year + '.');
+    RaiseException('Could not finalize the AuroraRevit manifest for Revit ' + Year + '.');
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -157,5 +165,5 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := True;
   if CurPageID = wpFinished then
-    MsgBox('AuroraRevit was installed for Revit ' + InstalledYears + '. Use the AuroraRevit Proxy shortcut to start the local AI proxy, then open Revit.', mbInformation, MB_OK);
+    MsgBox('AuroraRevit was installed for Revit ' + InstalledYears + '. Restart Revit, then use the Aurora AI Assistant button in the Aurora ribbon panel.', mbInformation, MB_OK);
 end;

@@ -102,7 +102,7 @@ jobs:
           $revitRoot = Join-Path $stage ('Revit' + $env:REVT_VERSION)
           New-Item -ItemType Directory -Path (Join-Path $revitRoot 'Release\RevitAddin') -Force | Out-Null
           New-Item -ItemType Directory -Path (Join-Path $revitRoot ('publish\Manifests\Revit' + $env:REVT_VERSION)) -Force | Out-Null
-          Copy-Item 'Release\RevitAddin\AuroraRevit.RevitAddin.dll' (Join-Path $revitRoot 'Release\RevitAddin') -Force
+          Copy-Item 'Release\RevitAddin\*' (Join-Path $revitRoot 'Release\RevitAddin') -Recurse -Force
           Copy-Item (Join-Path (Join-Path 'publish\Manifests' ('Revit' + $env:REVT_VERSION)) 'AuroraRevit.addin') (Join-Path $revitRoot ('publish\Manifests\Revit' + $env:REVT_VERSION)) -Force
           if ($env:REVT_VERSION -eq '2025') {
             Copy-Item 'publish\AiProxy' (Join-Path $stage 'common\AiProxy') -Recurse -Force

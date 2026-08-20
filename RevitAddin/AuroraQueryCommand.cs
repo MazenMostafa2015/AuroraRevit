@@ -21,15 +21,16 @@ namespace AuroraRevit.RevitAddin
         {
             try
             {
-                var result = _proxyClient.SendQueryAsync(
-                    "Connection test from the Aurora Revit add-in.").GetAwaiter().GetResult();
-
-                TaskDialog.Show("Aurora AI Assistant", result.Response ?? result.Message ?? result.RawJson);
+                var pane = commandData.Application.GetDockablePane(AuroraApplication.PaneId);
+                if (!pane.IsShown())
+                {
+                    pane.Show();
+                }
                 return Result.Succeeded;
             }
             catch (Exception exception)
             {
-                message = "Unable to reach the Aurora proxy at http://localhost:5000. " + exception.Message;
+                message = "Aurora could not open its dockable command bar. Restart Revit and try the Aurora AI ribbon button again. " + exception.Message;
                 return Result.Failed;
             }
         }

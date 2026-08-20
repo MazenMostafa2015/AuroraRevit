@@ -28,7 +28,42 @@ namespace AuroraRevit.RevitAddin
                 "Aurora AI Assistant",
                 new AuroraDockablePaneProvider());
 
+            AddRibbonButton(application);
             return Result.Succeeded;
+        }
+
+        private static void AddRibbonButton(UIControlledApplication application)
+        {
+            try
+            {
+                const string tabName = "Aurora AI";
+                try
+                {
+                    application.CreateRibbonTab(tabName);
+                }
+                catch (Autodesk.Revit.Exceptions.ArgumentException)
+                {
+                    // The tab already exists, which is safe during reloads.
+                }
+
+                var panel = application.CreateRibbonPanel(tabName, "Aurora Assistant");
+                var assemblyPath = typeof(AuroraApplication).Assembly.Location;
+                var buttonData = new PushButtonData(
+                    "AuroraAICommand",
+                    "Aurora\nAI",
+                    assemblyPath,
+                    typeof(AuroraQueryCommand).FullName);
+                var button = panel.AddItem(buttonData) as PushButton;
+                if (button != null)
+                {
+                    button.ToolTip = "Open the Aurora AI Assistant command bar.";
+                    button.LongDescription = "Open the compact bottom command bar, browse examples, and send prompts to the local Aurora proxy.";
+                }
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Debug.WriteLine("Aurora ribbon registration failed: " + exception.Message);
+            }
         }
 
         public Result OnShutdown(UIControlledApplication application)
