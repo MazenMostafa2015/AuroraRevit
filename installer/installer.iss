@@ -100,22 +100,34 @@ begin
   Result := True;
 end;
 
-function ReplaceAssemblyPath(Content: AnsiString; AssemblyPath: String): AnsiString;
+function ReplaceAssemblyPaths(Content: AnsiString; AssemblyPath: String): AnsiString;
 var
+  SearchPos: Integer;
+  RelativeStart: Integer;
   StartPos: Integer;
   EndPos: Integer;
   Prefix: String;
   Suffix: String;
+  Tail: String;
 begin
-  StartPos := Pos('<Assembly>', Content);
-  EndPos := Pos('</Assembly>', Content);
-  if (StartPos = 0) or (EndPos = 0) or (EndPos <= StartPos) then begin
-    Result := Content;
-    exit;
+  Result := Content;
+  SearchPos := 1;
+  while SearchPos <= Length(Result) do begin
+    Tail := Copy(Result, SearchPos, Length(Result) - SearchPos + 1);
+    RelativeStart := Pos('<Assembly>', Tail);
+    if RelativeStart = 0 then
+      break;
+    StartPos := SearchPos + RelativeStart - 1;
+    Tail := Copy(Result, StartPos, Length(Result) - StartPos + 1);
+    EndPos := Pos('</Assembly>', Tail);
+    if EndPos = 0 then
+      break;
+    EndPos := StartPos + EndPos - 1;
+    Prefix := Copy(Result, 1, StartPos + Length('<Assembly>') - 1);
+    Suffix := Copy(Result, EndPos, Length(Result) - EndPos + 1);
+    Result := Prefix + AssemblyPath + Suffix;
+    SearchPos := StartPos + Length('<Assembly>') + Length(AssemblyPath);
   end;
-  Prefix := Copy(Content, 1, StartPos + Length('<Assembly>') - 1);
-  Suffix := Copy(Content, EndPos, Length(Content) - EndPos + 1);
-  Result := Prefix + AssemblyPath + Suffix;
 end;
 
 procedure InstallRevitFiles(Year: String);
@@ -134,7 +146,7 @@ begin
     RaiseException('The AuroraRevit add-in files were not copied for Revit ' + Year + '.');
   if not LoadStringFromFile(ManifestDestination, ManifestContent) then
     RaiseException('Could not read the AuroraRevit manifest for Revit ' + Year + '.');
-  ManifestContent := ReplaceAssemblyPath(ManifestContent, AssemblyDestination);
+  ManifestContent := ReplaceAssemblyPaths(ManifestContent, AssemblyDestination);
   if not SaveStringToFile(ManifestDestination, ManifestContent, False) then
     RaiseException('Could not finalize the AuroraRevit manifest for Revit ' + Year + '.');
 end;

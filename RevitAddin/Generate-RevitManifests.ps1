@@ -21,9 +21,9 @@ foreach ($version in $versions) {
     New-Item -ItemType Directory -Path $versionDirectory -Force | Out-Null
 
     $manifest = @"
-<?xml version=""1.0"" encoding=""utf-8"" standalone=""no""?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <RevitAddIns>
-  <AddIn Type=""Application"">
+  <AddIn Type="Application">
     <Name>Aurora Revit AI Assistant</Name>
     <Assembly>$xmlAssemblyPath</Assembly>
     <AddInId>7B0A7C2A-6C4B-4DB7-9D3A-EF5E8B5CF901</AddInId>
@@ -31,7 +31,7 @@ foreach ($version in $versions) {
     <VendorId>AURORA</VendorId>
     <VendorDescription>Aurora AI Assistant for Autodesk Revit $version</VendorDescription>
   </AddIn>
-  <AddIn Type=""Command"">
+  <AddIn Type="Command">
     <Text>Aurora AI Query</Text>
     <Description>Send a prompt to the local Aurora AI proxy.</Description>
     <Assembly>$xmlAssemblyPath</Assembly>
