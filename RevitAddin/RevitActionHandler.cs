@@ -103,14 +103,31 @@ namespace AuroraRevit.RevitAddin
             }
 
             var doc = application.ActiveUIDocument.Document;
+            if (!ViewSchedule.IsValidCategoryForSchedule(categoryId))
+            {
+                return RevitActionResult.Failure(
+                    "Revit 2025 cannot create a regular schedule for '" + categoryName + "' in this context. Try ducts, pipes, cable_trays, or mechanical_equipment.");
+            }
+
             var scheduleName = string.IsNullOrWhiteSpace(requestedName) ? categoryName + " Schedule" : requestedName.Trim();
             using (Transaction tx = new Transaction(doc, "AI Action - Create Schedule"))
             {
-                tx.Start();
-                var schedule = ViewSchedule.CreateSchedule(doc, categoryId);
-                schedule.Name = MakeUniqueScheduleName(doc, scheduleName);
-                tx.Commit();
-                return RevitActionResult.Success("Created schedule '" + schedule.Name + "' for " + categoryName + ".");
+                try
+                {
+                    tx.Start();
+                    var schedule = ViewSchedule.CreateSchedule(doc, categoryId);
+                    schedule.Name = MakeUniqueScheduleName(doc, scheduleName);
+                    tx.Commit();
+                    return RevitActionResult.Success("Created schedule '" + schedule.Name + "' for " + categoryName + ".");
+                }
+                catch
+                {
+                    if (tx.GetStatus() == TransactionStatus.Started)
+                    {
+                        tx.RollBack();
+                    }
+                    throw;
+                }
             }
         }
 
