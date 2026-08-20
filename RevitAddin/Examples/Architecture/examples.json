@@ -38,5 +38,25 @@
   {
     "title": "Create a Department Room Color Scheme",
     "prompt": "Create a new color scheme for rooms by department."
+  },
+  {
+    "title": "Create 6-Inch Concrete Floor Type",
+    "prompt": "Create a new 6-inch thick concrete floor type."
+  },
+  {
+    "title": "Select All Project Windows",
+    "prompt": "Select all windows in the project."
+  },
+  {
+    "title": "Generate Door Schedule With Widths and Fire Ratings",
+    "prompt": "Generate a door schedule with widths and fire ratings."
+  },
+  {
+    "title": "Create Room Department Color Scheme",
+    "prompt": "Create a new color scheme for rooms by department."
+  },
+  {
+    "title": "Create Roof Level at 15 Meters",
+    "prompt": "Create a new Level named 'Roof' at 15 meters elevation."
   }
 ]

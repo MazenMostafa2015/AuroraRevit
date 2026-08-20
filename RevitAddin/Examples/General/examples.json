@@ -38,5 +38,25 @@
   {
     "title": "Create a Construction Status Parameter",
     "prompt": "Create a new project parameter for 'Construction Status' with a Yes/No checkbox."
+  },
+  {
+    "title": "Export Current 3D View to DWG",
+    "prompt": "Export the current 3D view to a DWG file."
+  },
+  {
+    "title": "Duplicate Current View for Review",
+    "prompt": "Duplicate the current view and rename the copy to 'Copy for Review'."
+  },
+  {
+    "title": "Dimension All Walls in Active Plan",
+    "prompt": "Add a dimension chain to all walls in the active plan view."
+  },
+  {
+    "title": "Batch Rename Floor Plans to FP Prefix",
+    "prompt": "Batch rename all views starting with 'Floor Plan' to 'FP_' prefix."
+  },
+  {
+    "title": "Create Construction Status Project Parameter",
+    "prompt": "Create a new project parameter for 'Construction Status' with a Yes/No checkbox."
   }
 ]

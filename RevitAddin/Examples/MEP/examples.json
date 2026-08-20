@@ -42,5 +42,25 @@
   {
     "title": "Count All HVAC Ducts",
     "prompt": "Count all HVAC ducts in the active project."
+  },
+  {
+    "title": "Create Pipe Schedule for All Pipes",
+    "prompt": "Create a new pipe schedule for all Pipes."
+  },
+  {
+    "title": "List Air Terminals in Current View",
+    "prompt": "List all air terminals in the current view."
+  },
+  {
+    "title": "Create Cable Tray Segment",
+    "prompt": "Create a new cable tray segment between two selected points."
+  },
+  {
+    "title": "Add Sink to Selected Room",
+    "prompt": "Add a new plumbing fixture (Sink) to a selected room."
+  },
+  {
+    "title": "Create System for Selected Air Terminals",
+    "prompt": "Create a new mechanical system for the selected air terminals."
   }
 ]
