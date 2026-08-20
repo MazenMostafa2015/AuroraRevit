@@ -13,7 +13,7 @@ DefaultDirName={autopf}\AuroraRevit
 DefaultGroupName=AuroraRevit
 DisableProgramGroupPage=yes
 PrivilegesRequired=admin
-ArchitecturesInstallIn64BitMode=x64
+ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=output
 OutputBaseFilename=AuroraRevit-Setup
 Compression=lzma2/ultra64
@@ -122,7 +122,7 @@ begin
   AssemblyDestination := AddinDirectory + '\\AuroraRevit.RevitAddin.dll';
   ManifestDestination := AddinDirectory + '\\AuroraRevit.addin';
 
-  if not FileCopy(AssemblySource, AssemblyDestination, False) then
+  if not CopyFile(AssemblySource, AssemblyDestination, False) then
     RaiseException('Could not install the AuroraRevit add-in assembly for Revit ' + Year + '.');
   if not LoadStringFromFile(ManifestSource, ManifestContent) then
     RaiseException('Could not read the AuroraRevit manifest for Revit ' + Year + '.');
