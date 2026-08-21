@@ -1,6 +1,6 @@
 #define MyAppName "AuroraRevit AI Assistant"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.8.8"
+  #define MyAppVersion "1.9.0"
 #endif
 
 [Setup]
@@ -35,6 +35,9 @@ Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Dirs]
 Name: "C:\AuroraRevit_Logs"

@@ -22,8 +22,8 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   CONFIGURATION: Release
-  RELEASE_VERSION: 1.8.8
-  RELEASE_TITLE: AuroraRevit v1.8.8 - Command Tools Edition
+  RELEASE_VERSION: 1.9.0
+  RELEASE_TITLE: AuroraRevit v1.9.0 - Command Tools Edition
 
 jobs:
   build:
@@ -147,7 +147,11 @@ jobs:
             'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton\script.py',
-            'RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\script.py'
+            'RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml'
           )
           foreach ($relative in $required) {
             $path = Join-Path $staged $relative
@@ -181,7 +185,11 @@ jobs:
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\script.py'),
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\script.py'),
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton\script.py'),
-            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\script.py')
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml')
           )) {
             if (-not (Test-Path $path)) { throw "Missing installer input: $path" }
           }
@@ -236,6 +244,9 @@ jobs:
             - CommandLine: dockable AI command bar with code review.
             - CommandLogViewer: recent log inspection and folder access.
             - CommandToolsStatus: installation and proxy diagnostics.
+            - ElementInspector: read-only element parameters and geometry preview.
+            - QuickSettings: model, Ollama, logging, and theme preferences.
+            - ExportToPDF: safe-preview sheet/view export through Revit PrintManager.
 
             The installer also creates the Aurora Command Tools desktop shortcut.
           generate_release_notes: true

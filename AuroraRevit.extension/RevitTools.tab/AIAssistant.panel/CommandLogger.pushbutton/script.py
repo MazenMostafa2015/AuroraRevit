@@ -15,18 +15,32 @@ import os
 import re
 import subprocess
 
-from System import Uri
 from System.Windows import Window, Thickness
-from System.Windows.Controls import Button, Grid, StackPanel, TextBlock
+from System.Windows.Controls import Button, StackPanel, TextBlock
 from System.Windows.Media import Brushes, SolidColorBrush, Color
-from System.Windows import HorizontalAlignment, VerticalAlignment
 
 try:
     from pyrevit import forms
 except Exception:
     forms = None
 
-LOG_DIR = r"C:\AuroraRevit_Logs"
+DEFAULT_LOG_DIR = r"C:\AuroraRevit_Logs"
+CONFIG_PATH = os.path.join(os.environ.get("APPDATA", DEFAULT_LOG_DIR), "AuroraRevit", "command_tools_settings.json")
+
+
+def _configured_log_dir():
+    try:
+        with open(CONFIG_PATH, "r") as handle:
+            settings = json.load(handle)
+            value = settings.get("log_folder") if isinstance(settings, dict) else None
+            if value and os.path.isabs(value):
+                return os.path.normpath(value)
+    except Exception:
+        pass
+    return DEFAULT_LOG_DIR
+
+
+LOG_DIR = _configured_log_dir()
 XLSX_PATH = os.path.join(LOG_DIR, "CommandLog.xlsx")
 CSV_PATH = os.path.join(LOG_DIR, "CommandLog.csv")
 STATE_PATH = os.path.join(LOG_DIR, "CommandLog.state.json")

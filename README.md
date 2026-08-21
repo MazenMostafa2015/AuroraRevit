@@ -44,14 +44,19 @@ The AuroraRevit installer now deploys a complete pyRevit command-tools bundle to
 | `CommandLine.pushbutton` | Provides an AutoCAD-style command bar with AI/proxy status, Send, Expand Chat, Show Last Log Entry, direct sibling loading of the existing AIChat engine, and a read-only generated-code review window. |
 | `CommandLogViewer.pushbutton` | Shows the latest log rows and opens the log folder for quick inspection. |
 | `CommandToolsStatus.pushbutton` | Diagnoses installed buttons, Revit journal availability, log-folder readiness, and proxy ports 5000/5001. |
+| `ElementInspector.pushbutton` | Lets the user pick one element and inspect its read-only identity, category, type/family, coordinates, bounding box, and parameters. It never opens a transaction. |
+| `QuickSettings.pushbutton` | Saves the AI model, Ollama endpoint, log-folder, and light/dark preference per Windows user in a JSON settings file. |
+| `ExportToPDF.pushbutton` | Selects printable sheets/views, shows a Safe Preview, asks for confirmation, and submits the set through Revit `PrintManager` to the configured PDF printer. |
 
-The Windows installer creates a desktop shortcut named **Aurora Command Tools** that opens `C:\\AuroraRevit_Logs`. The GitHub Actions workflow stages the pyRevit folders into the installer payload and verifies the expected scripts before compiling `AuroraRevit-Setup.exe`.
+The three expansion buttons were chosen because they cover common command-tool follow-up actions without granting arbitrary model-write or code-execution privileges. Element Inspector is read-only, Quick Settings changes only user-local preferences, and Export to PDF requires explicit confirmation after previewing the selected views.
+
+The Windows installer creates a desktop shortcut named **Aurora Command Tools** that opens `C:\\AuroraRevit_Logs`. The GitHub Actions workflow stages the pyRevit folders into the installer payload, verifies every required script before compiling `AuroraRevit-Setup.exe`, and publishes the v1.9.0 release asset.
 
 ## Build prerequisites
 
 Build the solution on Windows with Visual Studio 2022, the .NET Framework 4.8 developer pack, and the .NET 8 SDK. The RevitAddin project uses version-specific Nice3point community NuGet packages for RevitAPI and RevitAPIUI, so the GitHub Actions workflow does not require local Revit DLL paths. The matrix selects Revit 2023, 2024, or 2025 with `-p:RevitVersion=2023|2024|2025`.
 
-The authoritative CI workflow is `.github/workflows/build-revit-addin.yml`. It runs on `windows-latest`, restores and builds each supported target, publishes both proxy executables as self-contained `win-x64` outputs, generates the matching `.addin` manifest, and uploads the release artifact.
+The authoritative CI workflow is `.github/workflows/build-revit-addin.yml`. It runs on `windows-latest`, restores and builds each supported target, publishes both proxy executables as self-contained `win-x64` outputs, generates the matching `.addin` manifest, stages and verifies the pyRevit command-tools extension, and uploads the release artifact.
 
 ## Configure and start the proxy
 
