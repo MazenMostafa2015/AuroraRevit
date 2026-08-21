@@ -11,6 +11,7 @@ buttons = [
     "ElementInspector.pushbutton",
     "QuickSettings.pushbutton",
     "ExportToPDF.pushbutton",
+    "UtilityTools.pushbutton",
 ]
 for button in buttons:
     script = panel / button / "script.py"
@@ -27,7 +28,7 @@ installer = (root / "installer" / "installer.iss").read_text(encoding="utf-8")
 workflow = (root / ".github" / "workflows" / "build-revit-addin.yml").read_text(encoding="utf-8")
 readme = (root / "README.md").read_text(encoding="utf-8")
 
-assert '#define MyAppVersion "1.9.0"' in installer
+assert '#define MyAppVersion "1.9.1"' in installer
 assert 'Name: "{autodesktop}\\Aurora Command Tools"' in installer
 assert 'Filename: "{sys}\\explorer.exe"' in installer
 assert 'C:\\AuroraRevit_Logs' in installer
@@ -37,15 +38,15 @@ for button in buttons:
     assert button + '\\script.py' in workflow, button
 assert "CommandLine.xaml" in workflow
 assert "Stage pyRevit_Extensions" in workflow
-assert "RELEASE_VERSION: 1.9.0" in workflow
-assert "RELEASE_TITLE: AuroraRevit v1.9.0 - Command Tools Edition" in workflow
+assert "RELEASE_VERSION: 1.9.1" in workflow
+assert "RELEASE_TITLE: AuroraRevit v1.9.1 - Full Utility Integration" in workflow
 for button in buttons:
     assert button in readme, button
 assert "PrintManager" in readme
 assert "Safe Preview" in readme
 
 print("validated_buttons={}".format(len(buttons)))
-print("validated_version=1.9.0")
+print("validated_version=1.9.1")
 print("validated_installer_paths=PASS")
 print("validated_workflow_staging=PASS")
 print("validated_readme=PASS")

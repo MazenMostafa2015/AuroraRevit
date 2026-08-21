@@ -50,7 +50,23 @@ The AuroraRevit installer now deploys a complete pyRevit command-tools bundle to
 
 The three expansion buttons were chosen because they cover common command-tool follow-up actions without granting arbitrary model-write or code-execution privileges. Element Inspector is read-only, Quick Settings changes only user-local preferences, and Export to PDF requires explicit confirmation after previewing the selected views.
 
-The Windows installer creates a desktop shortcut named **Aurora Command Tools** that opens `C:\\AuroraRevit_Logs`. The GitHub Actions workflow stages the pyRevit folders into the installer payload, verifies every required script before compiling `AuroraRevit-Setup.exe`, and publishes the v1.9.0 release asset.
+The Windows installer creates desktop shortcuts named **Aurora Command Tools** and **Aurora Utility Tools**, both opening `C:\\AuroraRevit_Logs`. The GitHub Actions workflow stages the pyRevit folders into the installer payload, verifies every required script before compiling `AuroraRevit-Setup.exe`, and publishes the v1.9.1 Full Utility Integration release.
+
+### UtilityTools.pushbutton
+
+`UtilityTools.pushbutton` is a single IronPython 2.7 script containing six focused commands:
+
+| Command | How to use it |
+| --- | --- |
+| **Export Current View to PDF** | Select an output folder and filename, choose orientation, paper size, and zoom, review the Safe Preview, then confirm submission through Revit `PrintManager`. |
+| **Export Active Schedule to Excel** | Activate a `ViewSchedule`, choose an output path, review row/column counts, and export a formatted workbook with a dark-blue/white header. Falls back to CSV when `openpyxl` is unavailable. |
+| **Batch Parameter Translator** | Choose a category, source parameter, target parameter, search text, and replacement text. Review the match count before the transaction updates writable target parameters and logs the operation. |
+| **Background Calculation Killer** | Enables a reversible performance mode on the active view using coarse detail and wireframe where supported. It does not pretend to disable unsupported global Revit calculations. |
+| **Restore Calculations** | Restores the active-view settings captured by the performance mode command. |
+| **Smart Safety Detailer** | Pick a floor/slab, set default 1.2-metre post spacing, review the boundary-length preview, and confirm creation of a railing path using the loaded Revit railing type. |
+| **Schedule Export to Excel** | Performs the same active-schedule extraction with a clean, minimally formatted workbook for fast data extraction. |
+
+All model-changing operations are guarded by Safe Preview and explicit confirmation. Read-only inspection and export commands do not modify the model. The railing tool reports that final baluster spacing is controlled by the loaded railing type, preventing a misleading guarantee when a project type has different family constraints.
 
 ## Build prerequisites
 

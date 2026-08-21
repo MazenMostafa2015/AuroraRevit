@@ -1,6 +1,6 @@
 #define MyAppName "AuroraRevit AI Assistant"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.9.0"
+  #define MyAppVersion "1.9.1"
 #endif
 
 [Setup]
@@ -38,6 +38,7 @@ Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Dirs]
 Name: "C:\AuroraRevit_Logs"
@@ -45,6 +46,7 @@ Name: "C:\AuroraRevit_Logs"
 [Icons]
 Name: "{autodesktop}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
 Name: "{autodesktop}\Aurora Command Tools"; Filename: "{sys}\explorer.exe"; Parameters: "C:\AuroraRevit_Logs"; WorkingDir: "C:\AuroraRevit_Logs"; Comment: "Open AuroraRevit command logs"
+Name: "{autodesktop}\Aurora Utility Tools"; Filename: "{sys}\explorer.exe"; Parameters: "C:\AuroraRevit_Logs"; WorkingDir: "C:\AuroraRevit_Logs"; Comment: "Open AuroraRevit utility logs"
 Name: "{group}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
 Name: "{group}\Uninstall AuroraRevit"; Filename: "{uninstallexe}"
 

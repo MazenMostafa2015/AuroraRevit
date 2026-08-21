@@ -103,6 +103,7 @@ line = load("line_sim", os.path.join(panel, "CommandLine.pushbutton", "script.py
 inspector = load("inspector_sim", os.path.join(panel, "ElementInspector.pushbutton", "script.py"))
 settings = load("settings_sim", os.path.join(panel, "QuickSettings.pushbutton", "script.py"))
 pdf = load("pdf_sim", os.path.join(panel, "ExportToPDF.pushbutton", "script.py"))
+utility = load("utility_sim", os.path.join(panel, "UtilityTools.pushbutton", "script.py"))
 
 with tempfile.TemporaryDirectory() as temp:
     journal = os.path.join(temp, "journal.0001.txt")
@@ -121,10 +122,14 @@ assert line.CommandLinePanel.panel_id.count("-") == 4
 assert settings._valid_folder(os.path.abspath("AuroraRevit_Logs"))[0] is True
 assert pdf._label is not None
 assert inspector._coordinates is not None
+assert utility._choose is not None
+assert utility._write_schedule_file is not None
+assert utility._confirm is not None
 
 print("module_import_simulation=PASS")
 print("journal_occurrence_simulation=PASS")
 print("direct_sibling_loader_simulation=PASS")
 print("wpf_panel_contract_simulation=PASS")
 print("feature_module_imports=PASS")
+print("utility_tools_module_simulation=PASS")
 print("ironpython_runtime_simulation=PASS")

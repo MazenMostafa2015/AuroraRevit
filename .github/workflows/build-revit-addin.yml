@@ -22,8 +22,8 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   CONFIGURATION: Release
-  RELEASE_VERSION: 1.9.0
-  RELEASE_TITLE: AuroraRevit v1.9.0 - Command Tools Edition
+  RELEASE_VERSION: 1.9.1
+  RELEASE_TITLE: AuroraRevit v1.9.1 - Full Utility Integration
 
 jobs:
   build:
@@ -151,7 +151,8 @@ jobs:
             'RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\script.py',
-            'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml'
+            'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml',
+            'RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton\script.py'
           )
           foreach ($relative in $required) {
             $path = Join-Path $staged $relative
@@ -189,7 +190,8 @@ jobs:
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\script.py'),
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\script.py'),
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\script.py'),
-            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml')
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton\script.py')
           )) {
             if (-not (Test-Path $path)) { throw "Missing installer input: $path" }
           }
@@ -247,7 +249,8 @@ jobs:
             - ElementInspector: read-only element parameters and geometry preview.
             - QuickSettings: model, Ollama, logging, and theme preferences.
             - ExportToPDF: safe-preview sheet/view export through Revit PrintManager.
+            - UtilityTools: six safe Revit utilities in one discoverable pushbutton.
 
-            The installer also creates the Aurora Command Tools desktop shortcut.
+            The installer also creates the Aurora Command Tools and Aurora Utility Tools desktop shortcuts.
           generate_release_notes: true
           files: release-assets/AuroraRevit-Setup.exe
