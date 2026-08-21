@@ -34,6 +34,19 @@ This solution uses the Aurora Relay pattern: a Revit add-in communicates with a 
 | `AiProxy` | .NET 8 | Local ASP.NET Core proxy with OpenAI chat completion, JSON action normalization, localhost CORS, prompt validation, and port fallback |
 | `AiProxy.Desktop` | .NET 8 WPF | Local proxy GUI with start/stop controls, health status, active endpoint, and live logs |
 
+## Command Tools Edition
+
+The AuroraRevit installer now deploys a complete pyRevit command-tools bundle to the current user’s `%APPDATA%\\pyRevit\\Extensions\\AuroraRevit.extension\\RevitTools.tab\\AIAssistant.panel` directory. The bundle is independent of the existing `AIChat.pushbutton` and `QuickCommand.pushbutton` buttons.
+
+| Pushbutton | Purpose |
+| --- | --- |
+| `CommandLogger.pushbutton` | Scans recent Revit journal files and records command identifiers, Windows user, timestamp, Revit version, and an English translation in `C:\\AuroraRevit_Logs\\CommandLog.xlsx`, with CSV fallback. It tracks journal occurrences so repeated commands are not silently collapsed. |
+| `CommandLine.pushbutton` | Provides an AutoCAD-style command bar with AI/proxy status, Send, Expand Chat, Show Last Log Entry, direct sibling loading of the existing AIChat engine, and a read-only generated-code review window. |
+| `CommandLogViewer.pushbutton` | Shows the latest log rows and opens the log folder for quick inspection. |
+| `CommandToolsStatus.pushbutton` | Diagnoses installed buttons, Revit journal availability, log-folder readiness, and proxy ports 5000/5001. |
+
+The Windows installer creates a desktop shortcut named **Aurora Command Tools** that opens `C:\\AuroraRevit_Logs`. The GitHub Actions workflow stages the pyRevit folders into the installer payload and verifies the expected scripts before compiling `AuroraRevit-Setup.exe`.
+
 ## Build prerequisites
 
 Build the solution on Windows with Visual Studio 2022, the .NET Framework 4.8 developer pack, and the .NET 8 SDK. The RevitAddin project uses version-specific Nice3point community NuGet packages for RevitAPI and RevitAPIUI, so the GitHub Actions workflow does not require local Revit DLL paths. The matrix selects Revit 2023, 2024, or 2025 with `-p:RevitVersion=2023|2024|2025`.

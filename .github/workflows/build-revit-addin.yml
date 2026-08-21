@@ -22,6 +22,8 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   CONFIGURATION: Release
+  RELEASE_VERSION: 1.8.8
+  RELEASE_TITLE: AuroraRevit v1.8.8 - Command Tools Edition
 
 jobs:
   build:
@@ -132,6 +134,26 @@ jobs:
           path: payload-download
           merge-multiple: false
 
+      - name: Stage pyRevit_Extensions
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $source = Join-Path $env:GITHUB_WORKSPACE 'AuroraRevit.extension'
+          $staged = Join-Path $env:GITHUB_WORKSPACE 'pyRevit_Extensions\AuroraRevit.extension'
+          if (-not (Test-Path $source)) { throw "Missing pyRevit extension source: $source" }
+          New-Item -ItemType Directory -Path $staged -Force | Out-Null
+          Copy-Item $source $staged -Recurse -Force
+          $required = @(
+            'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\script.py'
+          )
+          foreach ($relative in $required) {
+            $path = Join-Path $staged $relative
+            if (-not (Test-Path $path)) { throw "Missing pyRevit command-tool script: $path" }
+          }
+
       - name: Assemble Inno Setup payload tree
         shell: pwsh
         run: |
@@ -143,6 +165,10 @@ jobs:
             if (-not (Test-Path $source)) { throw "Missing Revit payload: $source" }
             Copy-Item $source (Join-Path $payloadRoot ('Revit' + $year)) -Recurse -Force
           }
+          $pyRevitSource = Join-Path $env:GITHUB_WORKSPACE 'pyRevit_Extensions\AuroraRevit.extension'
+          $pyRevitDestination = Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension'
+          if (-not (Test-Path $pyRevitSource)) { throw "Missing staged pyRevit extension: $pyRevitSource" }
+          Copy-Item $pyRevitSource $pyRevitDestination -Recurse -Force
           $commonSource = Join-Path $env:GITHUB_WORKSPACE 'payload-download\AuroraRevit-Payload-Revit2025\common'
           if (-not (Test-Path $commonSource)) { throw "Missing common proxy payload: $commonSource" }
           Copy-Item $commonSource (Join-Path $payloadRoot 'common') -Recurse -Force
@@ -151,7 +177,11 @@ jobs:
             (Join-Path $payloadRoot 'common\AiProxyGui\AuroraRevit.ProxyGui.exe'),
             (Join-Path $payloadRoot 'Revit2023\Release\RevitAddin\AuroraRevit.RevitAddin.dll'),
             (Join-Path $payloadRoot 'Revit2024\Release\RevitAddin\AuroraRevit.RevitAddin.dll'),
-            (Join-Path $payloadRoot 'Revit2025\Release\RevitAddin\AuroraRevit.RevitAddin.dll')
+            (Join-Path $payloadRoot 'Revit2025\Release\RevitAddin\AuroraRevit.RevitAddin.dll'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\script.py')
           )) {
             if (-not (Test-Path $path)) { throw "Missing installer input: $path" }
           }
@@ -164,7 +194,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $releaseVersion = if ($env:GITHUB_REF -match '^refs/tags/v') { $env:GITHUB_REF_NAME.Substring(1) } else { "0.0.$env:GITHUB_RUN_NUMBER" }
+          $releaseVersion = if ($env:GITHUB_REF -match '^refs/tags/v') { $env:GITHUB_REF_NAME.Substring(1) } else { $env:RELEASE_VERSION }
           $iscc = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6\ISCC.exe'
           if (-not (Test-Path $iscc)) { throw "ISCC.exe was not found at $iscc" }
           & $iscc "/DMyAppVersion=$releaseVersion" "$env:GITHUB_WORKSPACE\installer\installer.iss"
@@ -197,5 +227,16 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('build-{0}', github.run_number) }}
+          name: ${{ env.RELEASE_TITLE }}
+          body: |
+            AuroraRevit Command Tools Edition.
+
+            Included pyRevit buttons:
+            - CommandLogger: journal command logging to Excel/CSV.
+            - CommandLine: dockable AI command bar with code review.
+            - CommandLogViewer: recent log inspection and folder access.
+            - CommandToolsStatus: installation and proxy diagnostics.
+
+            The installer also creates the Aurora Command Tools desktop shortcut.
           generate_release_notes: true
           files: release-assets/AuroraRevit-Setup.exe

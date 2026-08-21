@@ -1,6 +1,6 @@
 #define MyAppName "AuroraRevit AI Assistant"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.8.5"
+  #define MyAppVersion "1.8.8"
 #endif
 
 [Setup]
@@ -31,9 +31,17 @@ Source: "payload\Revit2024\Release\RevitAddin\*"; DestDir: "{userappdata}\Autode
 Source: "payload\Revit2024\publish\Manifests\Revit2024\AuroraRevit.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2024"; DestName: "AuroraRevit.addin"; Flags: ignoreversion; Check: IsRevit2024Installed
 Source: "payload\Revit2025\Release\RevitAddin\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2025"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRevit2025Installed
 Source: "payload\Revit2025\publish\Manifests\Revit2025\AuroraRevit.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2025"; DestName: "AuroraRevit.addin"; Flags: ignoreversion; Check: IsRevit2025Installed
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Dirs]
+Name: "C:\AuroraRevit_Logs"
 
 [Icons]
 Name: "{autodesktop}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
+Name: "{autodesktop}\Aurora Command Tools"; Filename: "{sys}\explorer.exe"; Parameters: "C:\AuroraRevit_Logs"; WorkingDir: "C:\AuroraRevit_Logs"; Comment: "Open AuroraRevit command logs"
 Name: "{group}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
 Name: "{group}\Uninstall AuroraRevit"; Filename: "{uninstallexe}"
 
