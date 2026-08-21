@@ -2,11 +2,11 @@
 
 An AI Assistant Add-in for Autodesk Revit 2023, 2024, and 2025 with 40 built-in discipline examples.
 
-## Current release: v1.9.1 Full Utility Integration
+## Current release: v1.9.2 Revit-Tested Utility UX
 
-The latest release is **[AuroraRevit v1.9.1 — Full Utility Integration](https://github.com/MazenMostafa2015/AuroraRevit/releases/tag/v1.9.1)**. Download the Windows installer directly from the [release assets](https://github.com/MazenMostafa2015/AuroraRevit/releases/download/v1.9.1/AuroraRevit-Setup.exe). The release combines the C# Revit add-in, local AI proxy, dockable CommandLine panel, command logging, safe utility workflows, and the complete pyRevit extension bundle.
+The latest release is **[AuroraRevit v1.9.2 — Revit-Tested Utility UX](https://github.com/MazenMostafa2015/AuroraRevit/releases/tag/v1.9.2)**. Download the Windows installer directly from the [release assets](https://github.com/MazenMostafa2015/AuroraRevit/releases/download/v1.9.2/AuroraRevit-Setup.exe). It includes the Revit-tested dockable command-line fix, safe example-preview fallback, improved cancellation handling, individual utility buttons, and per-button icons and tooltips.
 
-The installer deploys pyRevit tools to `%APPDATA%\\pyRevit\\Extensions\\AuroraRevit.extension\\RevitTools.tab\\AIAssistant.panel` and creates **Aurora Command Tools** and **Aurora Utility Tools** desktop shortcuts that open `C:\\AuroraRevit_Logs`. The tagged [GitHub Actions build](https://github.com/MazenMostafa2015/AuroraRevit/actions/runs/32521310613) validates the staged extension payload before compiling and publishing `AuroraRevit-Setup.exe`.
+The installer deploys pyRevit tools to `%APPDATA%\\pyRevit\\Extensions\\AuroraRevit.extension\\RevitTools.tab\\AIAssistant.panel` and creates **Aurora Command Tools** and **Aurora Utility Tools** desktop shortcuts that open `C:\\AuroraRevit_Logs`. The tagged [GitHub Actions build](https://github.com/MazenMostafa2015/AuroraRevit/actions) validates the staged extension payload, icons, descriptions, shared utility core, and XAML before compiling and publishing `AuroraRevit-Setup.exe`.
 
 ## One-step installer for published releases
 
@@ -49,18 +49,27 @@ The AuroraRevit installer now deploys a complete pyRevit command-tools bundle to
 | `CommandLogger.pushbutton` | Scans recent Revit journal files and records command identifiers, Windows user, timestamp, Revit version, and an English translation in `C:\\AuroraRevit_Logs\\CommandLog.xlsx`, with CSV fallback. It tracks journal occurrences so repeated commands are not silently collapsed. |
 | `CommandLine.pushbutton` | Provides an AutoCAD-style command bar with AI/proxy status, Send, Expand Chat, Show Last Log Entry, direct sibling loading of the existing AIChat engine, and a read-only generated-code review window. |
 | `CommandLogViewer.pushbutton` | Shows the latest log rows and opens the log folder for quick inspection. |
-| `CommandToolsStatus.pushbutton` | Diagnoses installed buttons, Revit journal availability, log-folder readiness, and proxy ports 5000/5001. |
-| `ElementInspector.pushbutton` | Lets the user pick one element and inspect its read-only identity, category, type/family, coordinates, bounding box, and parameters. It never opens a transaction. |
+| `CommandToolsStatus.pushbutton` | Diagnoses all installed buttons, Revit journal availability, log-folder readiness, and proxy ports 5000/5001. |
+| `ElementInspector.pushbutton` | Lets the user pick one element and inspect its read-only identity, category, type/family, coordinates, bounding box, and parameters. Escape is treated as a normal cancellation. |
 | `QuickSettings.pushbutton` | Saves the AI model, Ollama endpoint, log-folder, and light/dark preference per Windows user in a JSON settings file. |
 | `ExportToPDF.pushbutton` | Selects printable sheets/views, shows a Safe Preview, asks for confirmation, and submits the set through Revit `PrintManager` to the configured PDF printer. |
+| `ExportCurrentViewPDF.pushbutton` | Exports only the active view after selecting output settings and confirming a Safe Preview. |
+| `ExportScheduleExcel.pushbutton` | Exports the active schedule to formatted Excel, with CSV fallback when `openpyxl` is unavailable. |
+| `BatchParameterTranslator.pushbutton` | Previews controlled text replacement across writable parameters, then commits only after confirmation. |
+| `PerformanceMode.pushbutton` | Applies a reversible lightweight display mode to the active view. |
+| `RestorePerformanceMode.pushbutton` | Restores settings saved by Performance Mode. |
+| `SmartSafetyDetailer.pushbutton` | Previews and confirms a railing safety detail along a selected floor boundary. |
 
 The three expansion buttons were chosen because they cover common command-tool follow-up actions without granting arbitrary model-write or code-execution privileges. Element Inspector is read-only, Quick Settings changes only user-local preferences, and Export to PDF requires explicit confirmation after previewing the selected views.
 
-The Windows installer creates desktop shortcuts named **Aurora Command Tools** and **Aurora Utility Tools**, both opening `C:\\AuroraRevit_Logs`. The GitHub Actions workflow stages the pyRevit folders into the installer payload, verifies every required script before compiling `AuroraRevit-Setup.exe`, and publishes the v1.9.1 Full Utility Integration release.
+Every visible pyRevit button now includes a `bundle.yaml` description and a lightweight `icon.png`, so the ribbon communicates each command’s purpose before it is opened. The old single-menu `UtilityTools.pushbutton` has been removed. Its shared IronPython core is stored in a non-button `UtilityTools` folder, while each utility is independently visible and launchable.
 
-### UtilityTools.pushbutton
+The Windows installer creates desktop shortcuts named **Aurora Command Tools** and **Aurora Utility Tools**, both opening `C:\\AuroraRevit_Logs`. The GitHub Actions workflow stages and verifies each separate button, icon, tooltip, shared core, and XAML resource before compiling `AuroraRevit-Setup.exe` and publishing the v1.9.2 release.
 
-`UtilityTools.pushbutton` is a single IronPython 2.7 script containing six focused commands:
+### Separate utility pushbuttons
+
+The six utility commands are now independently visible in the `AIAssistant.panel`:
+
 
 | Command | How to use it |
 | --- | --- |

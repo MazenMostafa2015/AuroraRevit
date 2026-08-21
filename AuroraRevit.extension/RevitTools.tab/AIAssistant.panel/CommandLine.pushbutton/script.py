@@ -30,6 +30,7 @@ LOG_DIR = r"C:\AuroraRevit_Logs"
 XLSX_PATH = os.path.join(LOG_DIR, "CommandLog.xlsx")
 CSV_PATH = os.path.join(LOG_DIR, "CommandLog.csv")
 PANEL_ID = "f0d4c9a4-53ab-4dd5-aab4-2d3bb0a1df84"
+PANEL_XAML = "CommandLine.xaml"
 ACCENT_HEX = "#FF0078D4"
 IMPORT_ERRORS = {}
 
@@ -190,7 +191,7 @@ class CommandLinePanel(forms.WPFPanel if forms else object):
     """Registered Revit dockable panel for the command bar."""
 
     panel_id = PANEL_ID
-    panel_source = "CommandLine.xaml"
+    panel_source = PANEL_XAML
     panel_title = "Aurora Command Line"
 
     def __init__(self):
@@ -254,15 +255,26 @@ def _open_panel():
     if not forms:
         return None
     try:
-        if not forms.is_registered_dockable_panel(CommandLinePanel):
-            forms.register_dockable_panel(CommandLinePanel)
-    except Exception as error:
-        IMPORT_ERRORS["dockable_panel"] = str(error)
+        registered = forms.is_registered_dockable_panel(CommandLinePanel)
+    except Exception:
+        registered = False
+    if not registered:
+        try:
+            # Registration creates the live WPFPanel provider. Do not call open
+            # if this step fails or Revit reports an invalid XAML/resource path.
+            forms.register_dockable_panel(CommandLinePanel, default_visible=False)
+        except Exception as error:
+            detail = "Dockable panel registration failed: " + str(error)
+            IMPORT_ERRORS["dockable_panel"] = detail
+            _show(detail, title="Aurora Command Line")
+            return None
     try:
         forms.open_dockable_panel(CommandLinePanel)
-        return forms.get_dockable_panel(CommandLinePanel)
+        return True
     except Exception as error:
-        _show("Could not open the dockable command line: " + str(error))
+        detail = "Dockable panel was registered but could not be opened: " + str(error)
+        IMPORT_ERRORS["dockable_panel"] = detail
+        _show(detail, title="Aurora Command Line")
         return None
 
 

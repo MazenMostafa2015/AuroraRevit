@@ -103,7 +103,18 @@ line = load("line_sim", os.path.join(panel, "CommandLine.pushbutton", "script.py
 inspector = load("inspector_sim", os.path.join(panel, "ElementInspector.pushbutton", "script.py"))
 settings = load("settings_sim", os.path.join(panel, "QuickSettings.pushbutton", "script.py"))
 pdf = load("pdf_sim", os.path.join(panel, "ExportToPDF.pushbutton", "script.py"))
-utility = load("utility_sim", os.path.join(panel, "UtilityTools.pushbutton", "script.py"))
+utility = load("utility_sim", os.path.join(panel, "UtilityTools", "utility_core.py"))
+utility_wrappers = [
+    load("utility_wrapper_" + str(index), os.path.join(panel, folder, "script.py"))
+    for index, folder in enumerate([
+        "ExportCurrentViewPDF.pushbutton",
+        "ExportScheduleExcel.pushbutton",
+        "BatchParameterTranslator.pushbutton",
+        "PerformanceMode.pushbutton",
+        "RestorePerformanceMode.pushbutton",
+        "SmartSafetyDetailer.pushbutton",
+    ])
+]
 
 with tempfile.TemporaryDirectory() as temp:
     journal = os.path.join(temp, "journal.0001.txt")
@@ -125,11 +136,12 @@ assert inspector._coordinates is not None
 assert utility._choose is not None
 assert utility._write_schedule_file is not None
 assert utility._confirm is not None
+assert len(utility_wrappers) == 6
 
 print("module_import_simulation=PASS")
 print("journal_occurrence_simulation=PASS")
 print("direct_sibling_loader_simulation=PASS")
 print("wpf_panel_contract_simulation=PASS")
 print("feature_module_imports=PASS")
-print("utility_tools_module_simulation=PASS")
+print("utility_tools_core_and_wrappers_simulation=PASS")
 print("ironpython_runtime_simulation=PASS")

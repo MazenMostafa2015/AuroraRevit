@@ -80,6 +80,35 @@ namespace AuroraRevit.RevitAddin
             }
         }
 
+        private string BuildExampleCode(RevitExample selectedExample)
+        {
+            if (selectedExample == null)
+            {
+                return string.Empty;
+            }
+
+            if (selectedExample.HasCodeTemplate)
+            {
+                return selectedExample.CodeTemplate;
+            }
+
+            var prompt = (selectedExample.Prompt ?? string.Empty)
+                .Replace("\r", " ")
+                .Replace("\n", " ");
+            return "// AuroraRevit safe preview scaffold\r\n"
+                + "// This example has a prompt but no embedded executable template.\r\n"
+                + "// Prompt: " + prompt + "\r\n\r\n"
+                + "using Autodesk.Revit.DB;\r\n\r\n"
+                + "public static class AuroraExamplePreview\r\n"
+                + "{\r\n"
+                + "    public static void Run(Document doc)\r\n"
+                + "    {\r\n"
+                + "        // Ask Aurora to generate reviewed Revit API code for this prompt.\r\n"
+                + "        // No model-changing code is executed from this preview.\r\n"
+                + "    }\r\n"
+                + "}";
+        }
+
         private async void ExampleList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var list = sender as ListBox;
@@ -90,7 +119,7 @@ namespace AuroraRevit.RevitAddin
             }
 
             PromptTextBox.Text = selectedExample.Prompt;
-            ExampleCodeTextBox.Text = selectedExample.CodeTemplate ?? "No code template is available for this legacy example.";
+            ExampleCodeTextBox.Text = BuildExampleCode(selectedExample);
             ExampleCodePanel.Visibility = Visibility.Visible;
             PromptTextBox.Focus();
             PromptTextBox.CaretIndex = PromptTextBox.Text.Length;

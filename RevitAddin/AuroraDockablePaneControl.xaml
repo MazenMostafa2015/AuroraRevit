@@ -96,9 +96,9 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="Example Gallery" Foreground="{StaticResource PrimaryText}" FontSize="13" FontWeight="SemiBold" />
-                                <TextBlock Text="40 new v1.8.3 templates" DockPanel.Dock="Right" Foreground="{StaticResource AccentBrush}" FontSize="10" />
+                                <TextBlock Text="40 built-in templates" DockPanel.Dock="Right" Foreground="{StaticResource AccentBrush}" FontSize="10" />
                             </DockPanel>
-                            <TextBlock Text="Choose a discipline, then click a prompt to preview its runnable Revit API code and send it." Foreground="{StaticResource SecondaryText}" FontSize="10" Margin="0,3,0,7" TextWrapping="Wrap" />
+                            <TextBlock Text="Choose a discipline, then click a prompt to preview safe reviewed Revit API guidance and send it." Foreground="{StaticResource SecondaryText}" FontSize="10" Margin="0,3,0,7" TextWrapping="Wrap" />
                             <TabControl x:Name="ExampleDisciplineTabs" Background="Transparent" BorderThickness="0" FontSize="11">
                                 <TabItem Header="Architecture"><ListBox x:Name="ArchitectureExamplesList" Style="{StaticResource GalleryList}" DisplayMemberPath="Title" SelectionChanged="ExampleList_SelectionChanged" /></TabItem>
                                 <TabItem Header="Structure"><ListBox x:Name="StructureExamplesList" Style="{StaticResource GalleryList}" DisplayMemberPath="Title" SelectionChanged="ExampleList_SelectionChanged" /></TabItem>
@@ -110,7 +110,7 @@
                     <Border x:Name="ExampleCodePanel" Grid.Row="1" Visibility="Collapsed" Background="#0D121A" BorderBrush="#405070" BorderThickness="1" CornerRadius="9" Padding="10" Margin="0,0,0,9">
                         <Grid>
                             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-                            <DockPanel Grid.Row="0"><TextBlock Text="Educational Code Template" Foreground="{StaticResource AccentBrush}" FontSize="11" FontWeight="SemiBold" /><Button x:Name="CopyExampleCodeButton" Content="Copy Code" Click="CopyExampleCodeButton_Click" Style="{StaticResource RoundedButton}" Background="#29356D" Padding="9,5" DockPanel.Dock="Right" /></DockPanel>
+                            <DockPanel Grid.Row="0"><TextBlock Text="Safe C# Preview" Foreground="{StaticResource AccentBrush}" FontSize="11" FontWeight="SemiBold" /><Button x:Name="CopyExampleCodeButton" Content="Copy Code" Click="CopyExampleCodeButton_Click" Style="{StaticResource RoundedButton}" Background="#29356D" Padding="9,5" DockPanel.Dock="Right" /></DockPanel>
                             <TextBox x:Name="ExampleCodeTextBox" Grid.Row="1" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" MaxHeight="130" Background="Transparent" BorderThickness="0" Foreground="#D4DDF2" FontFamily="Consolas" FontSize="10" Margin="0,7,0,0" />
                         </Grid>
                     </Border>

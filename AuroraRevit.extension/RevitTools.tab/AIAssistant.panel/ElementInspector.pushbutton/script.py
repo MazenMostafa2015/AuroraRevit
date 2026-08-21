@@ -154,7 +154,9 @@ def main():
         if element:
             _show_report(_report(element))
     except Exception as error:
-        if "cancel" not in _text(error).lower():
+        message = _text(error).lower()
+        # Revit/pyRevit reports Escape as either cancellation or an aborted pick.
+        if "cancel" not in message and "abort" not in message and "pick operation" not in message:
             forms.alert("Element inspection failed:\n\n" + _text(error), title="Aurora Element Inspector")
 
 

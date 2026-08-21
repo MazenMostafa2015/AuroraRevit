@@ -1,6 +1,6 @@
 #define MyAppName "AuroraRevit AI Assistant"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.9.1"
+  #define MyAppVersion "1.9.2"
 #endif
 
 [Setup]
@@ -38,7 +38,13 @@ Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportScheduleExcel.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportScheduleExcel.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\BatchParameterTranslator.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\BatchParameterTranslator.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\PerformanceMode.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\PerformanceMode.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\RestorePerformanceMode.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\RestorePerformanceMode.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\SmartSafetyDetailer.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\SmartSafetyDetailer.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Dirs]
 Name: "C:\AuroraRevit_Logs"
@@ -49,6 +55,9 @@ Name: "{autodesktop}\Aurora Command Tools"; Filename: "{sys}\explorer.exe"; Para
 Name: "{autodesktop}\Aurora Utility Tools"; Filename: "{sys}\explorer.exe"; Parameters: "C:\AuroraRevit_Logs"; WorkingDir: "C:\AuroraRevit_Logs"; Comment: "Open AuroraRevit utility logs"
 Name: "{group}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
 Name: "{group}\Uninstall AuroraRevit"; Filename: "{uninstallexe}"
+
+[InstallDelete]
+Type: filesandordirs; Name: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"

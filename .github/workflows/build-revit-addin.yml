@@ -22,8 +22,8 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   CONFIGURATION: Release
-  RELEASE_VERSION: 1.9.1
-  RELEASE_TITLE: AuroraRevit v1.9.1 - Full Utility Integration
+  RELEASE_VERSION: 1.9.2
+  RELEASE_TITLE: AuroraRevit v1.9.2 - Revit Tested Utility UX
 
 jobs:
   build:
@@ -145,18 +145,51 @@ jobs:
           Copy-Item (Join-Path $source '*') $staged -Recurse -Force
           $required = @(
             'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\bundle.yaml',
+            'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\icon.png',
             'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\bundle.yaml',
+            'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\icon.png',
             'RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\CommandToolsStatus.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\script.py',
-            'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml',
-            'RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton\script.py'
+            'RevitTools.tab\AIAssistant.panel\UtilityTools\utility_core.py',
+            'RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton\bundle.yaml',
+            'RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton\icon.png',
+            'RevitTools.tab\AIAssistant.panel\ExportScheduleExcel.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\BatchParameterTranslator.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\PerformanceMode.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\RestorePerformanceMode.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\SmartSafetyDetailer.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml'
           )
           foreach ($relative in $required) {
             $path = Join-Path $staged $relative
-            if (-not (Test-Path $path)) { throw "Missing pyRevit command-tool script: $path" }
+            if (-not (Test-Path $path)) { throw "Missing pyRevit command-tool resource: $path" }
+          }
+          $buttonFolders = @(
+            'CommandLogger.pushbutton',
+            'CommandLine.pushbutton',
+            'CommandLogViewer.pushbutton',
+            'CommandToolsStatus.pushbutton',
+            'ElementInspector.pushbutton',
+            'QuickSettings.pushbutton',
+            'ExportToPDF.pushbutton',
+            'ExportCurrentViewPDF.pushbutton',
+            'ExportScheduleExcel.pushbutton',
+            'BatchParameterTranslator.pushbutton',
+            'PerformanceMode.pushbutton',
+            'RestorePerformanceMode.pushbutton',
+            'SmartSafetyDetailer.pushbutton'
+          )
+          foreach ($folder in $buttonFolders) {
+            foreach ($fileName in @('bundle.yaml', 'icon.png')) {
+              $asset = Join-Path $staged ('RevitTools.tab\AIAssistant.panel\' + $folder + '\' + $fileName)
+              if (-not (Test-Path $asset)) { throw "Missing button asset: $asset" }
+            }
           }
 
       - name: Assemble Inno Setup payload tree
@@ -190,8 +223,14 @@ jobs:
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ElementInspector.pushbutton\script.py'),
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\script.py'),
             (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\script.py'),
-            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml'),
-            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools.pushbutton\script.py')
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\UtilityTools\utility_core.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\ExportScheduleExcel.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\BatchParameterTranslator.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\PerformanceMode.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\RestorePerformanceMode.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\SmartSafetyDetailer.pushbutton\script.py'),
+            (Join-Path $payloadRoot 'pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\CommandLine.xaml')
           )) {
             if (-not (Test-Path $path)) { throw "Missing installer input: $path" }
           }
@@ -249,7 +288,7 @@ jobs:
             - ElementInspector: read-only element parameters and geometry preview.
             - QuickSettings: model, Ollama, logging, and theme preferences.
             - ExportToPDF: safe-preview sheet/view export through Revit PrintManager.
-            - UtilityTools: six safe Revit utilities in one discoverable pushbutton.
+            - ExportCurrentViewPDF, ExportScheduleExcel, BatchParameterTranslator, PerformanceMode, RestorePerformanceMode, and SmartSafetyDetailer: separate visible utility pushbuttons with individual icons, tooltips, and Safe Preview boundaries.
 
             The installer also creates the Aurora Command Tools and Aurora Utility Tools desktop shortcuts.
           generate_release_notes: true
