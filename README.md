@@ -2,6 +2,12 @@
 
 An AI Assistant Add-in for Autodesk Revit 2023, 2024, and 2025 with 40 built-in discipline examples.
 
+## Current release: v1.9.1 Full Utility Integration
+
+The latest release is **[AuroraRevit v1.9.1 — Full Utility Integration](https://github.com/MazenMostafa2015/AuroraRevit/releases/tag/v1.9.1)**. Download the Windows installer directly from the [release assets](https://github.com/MazenMostafa2015/AuroraRevit/releases/download/v1.9.1/AuroraRevit-Setup.exe). The release combines the C# Revit add-in, local AI proxy, dockable CommandLine panel, command logging, safe utility workflows, and the complete pyRevit extension bundle.
+
+The installer deploys pyRevit tools to `%APPDATA%\\pyRevit\\Extensions\\AuroraRevit.extension\\RevitTools.tab\\AIAssistant.panel` and creates **Aurora Command Tools** and **Aurora Utility Tools** desktop shortcuts that open `C:\\AuroraRevit_Logs`. The tagged [GitHub Actions build](https://github.com/MazenMostafa2015/AuroraRevit/actions/runs/32521310613) validates the staged extension payload before compiling and publishing `AuroraRevit-Setup.exe`.
+
 ## One-step installer for published releases
 
 For a standard per-user installation from a published AuroraRevit release, review
@@ -209,9 +215,11 @@ The RevitAddin includes an embedded Example Library under `RevitAddin\\Examples`
 
 The WPF panel loads all embedded examples from assembly resources at startup. The ComboBox displays them as `[Discipline] - [Title]`; selecting an item copies its associated `prompt` into the existing input TextBox. The existing chat history, send button, loading behavior, SSE streaming, and action execution remain unchanged.
 
-## Reusable skill
+## Reusable skills and presentation
 
-The reusable skill created from this implementation workflow is available at `/home/ubuntu/skills/aurora-revit-ai-development/SKILL.md`. It covers the Revit project pattern, typed JSON actions, transaction safety, SSE event framing, WPF streaming consumption, and Windows release deployment.
+The original Revit implementation skill is available at `/home/ubuntu/skills/aurora-revit-ai-development/SKILL.md`. The reusable release-engineering skill created from the command-tools workflow is available at `/home/ubuntu/skills/aurora-pyrevit-release-engineering/SKILL.md`. It covers IronPython 2.7 and WPF auditing, safe Revit transactions, explicit sibling loading, Inno Setup payload integration, CI staging gates, version-conflict handling, GitHub publication, and final release verification.
+
+A summary presentation of the v1.9.1 features and architecture is available from the [AuroraRevit v1.9.1 presentation deck](https://github.com/MazenMostafa2015/AuroraRevit/releases/tag/v1.9.1).
 
 ## GitHub Actions CI build
 
