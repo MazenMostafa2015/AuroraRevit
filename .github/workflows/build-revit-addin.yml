@@ -142,7 +142,7 @@ jobs:
           $staged = Join-Path $env:GITHUB_WORKSPACE 'pyRevit_Extensions\AuroraRevit.extension'
           if (-not (Test-Path $source)) { throw "Missing pyRevit extension source: $source" }
           New-Item -ItemType Directory -Path $staged -Force | Out-Null
-          Copy-Item $source $staged -Recurse -Force
+          Copy-Item (Join-Path $source '*') $staged -Recurse -Force
           $required = @(
             'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\script.py',
