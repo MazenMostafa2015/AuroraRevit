@@ -2,33 +2,24 @@
 
 An AI Assistant Add-in for Autodesk Revit 2023, 2024, and 2025 with 101 embedded discipline examples, OpenAI Cloud routing, and direct Ollama Local support.
 
-## Current release: v2.0.0 Unified Hybrid AI
+## Current release: v2.1.0 Unified Hybrid AI Installer
 
-The latest release is **[AuroraRevit v2.0.0 — Unified Hybrid AI](https://github.com/MazenMostafa2015/AuroraRevit/releases/tag/v2.0.0)**. Download the Windows installer directly from the [release assets](https://github.com/MazenMostafa2015/AuroraRevit/releases/download/v2.0.0/AuroraRevit-Setup.exe). It includes the Revit-tested dockable command-line fix, safe example-preview fallback, improved cancellation handling, individual utility buttons, per-button icons and tooltips, and the unified OpenAI Cloud/Ollama Local provider architecture.
+The latest release is **[AuroraRevit v2.1.0 — Unified Hybrid AI Installer](https://github.com/MazenMostafa2015/AuroraRevit/releases/tag/v2.1.0)**. Download the Windows installer directly from the [release assets](https://github.com/MazenMostafa2015/AuroraRevit/releases/download/v2.1.0/AuroraRevit-Setup.exe). It includes the Revit-tested dockable command-line fix, safe example-preview fallback, improved cancellation handling, individual utility buttons, per-button icons and tooltips, runtime prerequisite checks, and the unified OpenAI Cloud/Ollama Local provider architecture.
 
-The installer deploys the C# add-in, local proxy, AIChat compatibility button, command tools, utility tools, shared `ai_router.py`, and all ribbon metadata. pyRevit tools are installed to `%APPDATA%\\pyRevit\\Extensions\\AuroraRevit.extension\\RevitTools.tab\\AIAssistant.panel`. It creates **AuroraRevit AI (Cloud)**, **AuroraRevit AI (Local)**, **Aurora Command Tools**, and **Aurora Utility Tools** shortcuts. If Ollama is not detected, installation continues and offers the official download page. The tagged [GitHub Actions build](https://github.com/MazenMostafa2015/AuroraRevit/actions) validates the hybrid client, staged extension payload, icons, descriptions, shared router, and XAML before compiling and publishing `AuroraRevit-Setup.exe`.
+The installer deploys the C# add-in, local proxy, AIChat compatibility button, command tools, utility tools, shared `ai_router.py`, and all ribbon metadata. pyRevit tools are installed to `%APPDATA%\\pyRevit\\Extensions\\AuroraRevit.extension\\RevitTools.tab\\AIAssistant.panel`. It creates **AuroraRevit AI (Cloud)**, **AuroraRevit AI (Local)**, **Aurora Command Tools**, and **Aurora Utility Tools** shortcuts. If Ollama is not detected, installation continues and offers the official download page. The tagged [GitHub Actions build](https://github.com/MazenMostafa2015/AuroraRevit/actions) validates the hybrid client, staged extension payload, icons, descriptions, shared router, XAML, and runtime prerequisites before compiling and publishing `AuroraRevit-Setup.exe`.
 
-## One-step installer for published releases
+## Automated Windows workstation updater
 
-For a standard per-user installation from a published AuroraRevit release, review
-or download `Setup-AuroraRevit.ps1` from this repository and run it from Windows
-PowerShell:
+The repository includes [`Update-AuroraRevit.ps1`](./Update-AuroraRevit.ps1). It backs up the active pyRevit extension, closes Revit after confirmation, downloads the official release installer, verifies the key command files, and restores the backup if deployment fails:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\Setup-AuroraRevit.ps1 -RevitVersion 2025
+Set-ExecutionPolicy -Scope Process Bypass
+.\Update-AuroraRevit.ps1 -Mode Release -Tag v2.1.0
 ```
 
-The setup script downloads the selected Revit 2025 release asset (default `v1.0.0`), deploys
-the add-in and local proxy below `%LOCALAPPDATA%\\AuroraRevit`, creates a per-user
-manifest in `%APPDATA%\\Autodesk\\Revit\\Addins\\<year>`, optionally saves the OpenAI
-proxy configuration for the current Windows user, and starts the local proxy. It
-does not require Administrator rights. The currently published installer targets
-**Revit 2025**; build the appropriate version-specific release from source before
-deploying AuroraRevit to Revit 2023 or 2024.
+Use `-WhatIf` for a dry run, `-Force` for unattended Revit closure, or `-Mode Source -RepoRoot <path>` to deploy only pyRevit files from a local checkout. The release installer installs the compiled C# add-in and both proxy executables; the source mode is intended for pyRevit development.
 
-> Review the script before running it. The proxy requires an OpenAI API key to
-> process AI queries. You may provide it securely when prompted, pass
-> `-OpenAiApiKey`, or configure `OpenAI__ApiKey` later for the current user.
+
 
 This solution uses a hybrid Aurora Relay pattern. OpenAI Cloud requests travel through the local .NET 8 ASP.NET Core proxy over HTTP/SSE. Ollama Local requests travel directly from the Revit add-in or pyRevit router to `http://localhost:11434/api/chat`. Both paths normalize responses into the same typed JSON action contract consumed by the add-in. The shared provider setting is selected by `AURORA_AI_PROVIDER`, Quick Settings JSON, or the dockable pane dropdown.
 
@@ -67,7 +58,7 @@ The three expansion buttons were chosen because they cover common command-tool f
 
 Every visible pyRevit button now includes a `bundle.yaml` description and a lightweight `icon.png`, so the ribbon communicates each command’s purpose before it is opened. The old single-menu `UtilityTools.pushbutton` has been removed. Its shared IronPython core is stored in a non-button `UtilityTools` folder, while each utility is independently visible and launchable.
 
-The Windows installer creates **AuroraRevit AI (Cloud)** and **AuroraRevit AI (Local)** launchers, plus **Aurora Command Tools** and **Aurora Utility Tools** log-folder shortcuts. The GitHub Actions workflow stages and verifies every button, icon, tooltip, shared core, provider router, and XAML resource before compiling `AuroraRevit-Setup.exe` and publishing the v2.0.0 release.
+The Windows installer creates **AuroraRevit AI (Cloud)** and **AuroraRevit AI (Local)** launchers, plus **Aurora Command Tools** and **Aurora Utility Tools** log-folder shortcuts. The GitHub Actions workflow stages and verifies every button, icon, tooltip, shared core, provider router, and XAML resource before compiling `AuroraRevit-Setup.exe` and publishing the v2.1.0 release.
 
 ### Separate utility pushbuttons
 

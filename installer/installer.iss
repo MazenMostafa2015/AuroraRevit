@@ -1,6 +1,6 @@
 #define MyAppName "AuroraRevit AI Assistant"
 #ifndef MyAppVersion
-  #define MyAppVersion "2.0.0"
+  #define MyAppVersion "2.1.0"
 #endif
 
 [Setup]
@@ -132,6 +132,48 @@ begin
   Result := True;
 end;
 
+function IsDotNet8Installed(): Boolean;
+var
+  ResultCode: Integer;
+  OutputPath: String;
+  OutputText: AnsiString;
+begin
+  OutputPath := ExpandConstant('{tmp}\\aurora-dotnet-runtime.txt');
+  Result := False;
+  if Exec(ExpandConstant('{cmd}'), '/C dotnet --list-runtimes > "' + OutputPath + '"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then begin
+    if LoadStringFromFile(OutputPath, OutputText) then
+      Result := Pos('Microsoft.NETCore.App 8.', OutputText) > 0;
+  end;
+end;
+
+function IsPythonLauncherAvailable(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := Exec(ExpandConstant('{cmd}'), '/C py --version', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
+end;
+
+procedure OfferRuntimeInstall();
+var
+  ResultCode: Integer;
+begin
+  if not IsDotNet8Installed() then begin
+    if MsgBox('.NET 8 was not detected. Attempt to install the .NET 8 Desktop Runtime with winget now?', mbConfirmation, MB_YESNO) = IDYES then begin
+      if not Exec(ExpandConstant('{cmd}'), '/C winget install --id Microsoft.DotNet.DesktopRuntime.8 --accept-source-agreements --accept-package-agreements', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then
+        ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/8.0', '', '', SW_SHOWNORMAL, ewNoWait, ResultCode);
+    end else
+      ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/8.0', '', '', SW_SHOWNORMAL, ewNoWait, ResultCode);
+  end;
+
+  if not IsPythonLauncherAvailable() then begin
+    Log('Python launcher (py) was not detected. Runtime operation does not require Python.');
+    if MsgBox('Python 3.11 was not detected. Install it with winget for local validation scripts?', mbConfirmation, MB_YESNO) = IDYES then begin
+      if not Exec(ExpandConstant('{cmd}'), '/C winget install --id Python.Python.3.11 --accept-source-agreements --accept-package-agreements', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then
+        ShellExec('open', 'https://www.python.org/downloads/windows/', '', '', SW_SHOWNORMAL, ewNoWait, ResultCode);
+    end;
+  end;
+end;
+
 procedure OfferOllamaDownload();
 var
   ErrorCode: Integer;
@@ -201,6 +243,7 @@ var
 begin
   if CurStep <> ssPostInstall then
     exit;
+  OfferRuntimeInstall();
   OfferOllamaDownload();
   Years := InstalledYears;
   while Years <> '' do begin

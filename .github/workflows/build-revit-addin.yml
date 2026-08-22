@@ -22,8 +22,8 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   CONFIGURATION: Release
-  RELEASE_VERSION: 2.0.0
-  RELEASE_TITLE: AuroraRevit v2.0.0 - Unified Hybrid AI
+  RELEASE_VERSION: 2.1.0
+  RELEASE_TITLE: AuroraRevit v2.1.0 - Unified Hybrid AI Installer
 
 jobs:
   build:
@@ -42,6 +42,27 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+
+      - name: Setup Python for validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run repository validation tests
+        shell: pwsh
+        run: |
+          python test_pyrevit_compat.py
+          python test_hybrid_router.py
+          python validate_hybrid_release.py
+          python -m compileall -q AuroraRevit.extension
+
+      - name: Verify runtime prerequisites
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $dotnet = dotnet --list-runtimes 2>$null
+          if (-not ($dotnet -match 'Microsoft.NETCore.App 8\.')) { throw '.NET 8 runtime is unavailable on the Windows runner.' }
+          if (Get-Command py -ErrorAction SilentlyContinue) { py --version } else { Write-Warning 'Python launcher was not found; repository validation is performed in the build contract and is not required for compilation.' }
 
       - name: Restore solution
         shell: pwsh
@@ -243,6 +264,14 @@ jobs:
       - name: Install latest Inno Setup
         shell: pwsh
         run: choco install innosetup --no-progress -y
+
+      - name: Verify installer prerequisites
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Get-Command py -ErrorAction SilentlyContinue)) { Write-Warning 'Python launcher is not installed on the installer runner; staged payload validation remains authoritative.' }
+          $dotnet = dotnet --list-runtimes 2>$null
+          if (-not ($dotnet -match 'Microsoft.NETCore.App 8\.')) { Write-Warning '.NET 8 runtime was not detected; proxies are self-contained.' }
 
       - name: Compile single-file installer
         shell: pwsh
