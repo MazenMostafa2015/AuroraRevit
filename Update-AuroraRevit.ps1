@@ -2,7 +2,7 @@
 param(
     [ValidateSet("Release", "Source")]
     [string]$Mode = "Release",
-    [string]$Tag = "v2.1.0",
+    [string]$Tag = "v2.1.1",
     [string]$RepoRoot = "",
     [switch]$Force,
     [switch]$LaunchRevit

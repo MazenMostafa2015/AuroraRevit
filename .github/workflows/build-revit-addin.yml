@@ -22,8 +22,8 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   CONFIGURATION: Release
-  RELEASE_VERSION: 2.1.0
-  RELEASE_TITLE: AuroraRevit v2.1.0 - Unified Hybrid AI Installer
+  RELEASE_VERSION: 2.1.1
+  RELEASE_TITLE: AuroraRevit v2.1.1 - Hybrid Fallback and Proxy Startup Fix
 
 jobs:
   build:

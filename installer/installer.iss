@@ -1,6 +1,6 @@
 #define MyAppName "AuroraRevit AI Assistant"
 #ifndef MyAppVersion
-  #define MyAppVersion "2.1.0"
+  #define MyAppVersion "2.1.1"
 #endif
 
 [Setup]
@@ -54,6 +54,7 @@ Name: "C:\AuroraRevit_Logs"
 [Icons]
 Name: "{autodesktop}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
 Name: "{autodesktop}\AuroraRevit AI (Cloud)"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "Start AuroraRevit with the OpenAI Cloud proxy"
+Name: "{userstartup}\AuroraRevit Proxy (automatic)"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "Start the AuroraRevit Cloud proxy when Windows starts"
 Name: "{autodesktop}\AuroraRevit AI (Local)"; Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\OllamaLauncher.ps1"""; WorkingDir: "{app}"; Comment: "Start or install Ollama Local for AuroraRevit"
 Name: "{autodesktop}\Aurora Command Tools"; Filename: "{sys}\explorer.exe"; Parameters: "C:\AuroraRevit_Logs"; WorkingDir: "C:\AuroraRevit_Logs"; Comment: "Open AuroraRevit command logs"
 Name: "{autodesktop}\Aurora Utility Tools"; Filename: "{sys}\explorer.exe"; Parameters: "C:\AuroraRevit_Logs"; WorkingDir: "C:\AuroraRevit_Logs"; Comment: "Open AuroraRevit utility logs"

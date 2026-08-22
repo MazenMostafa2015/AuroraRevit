@@ -59,9 +59,10 @@ workflow = (root / ".github" / "workflows" / "build-revit-addin.yml").read_text(
 readme = (root / "README.md").read_text(encoding="utf-8")
 launcher = (root / "installer" / "OllamaLauncher.ps1").read_text(encoding="utf-8")
 
-assert '#define MyAppVersion "2.1.0"' in installer
+assert '#define MyAppVersion "2.1.1"' in installer
 assert 'OllamaLauncher.ps1' in installer
 assert 'AuroraRevit AI (Cloud)' in installer
+assert '{userstartup}\\AuroraRevit Proxy (automatic)' in installer
 assert 'AuroraRevit AI (Local)' in installer
 assert 'https://ollama.com/download/windows' in installer
 assert 'AIChat.pushbutton\\*' in installer
@@ -86,17 +87,17 @@ assert 'AURORA_OLLAMA_MODEL' in router_text
 assert 'AURORA_OLLAMA_MODEL' in hybrid
 assert 'StreamWithProviderAsync' in hybrid
 assert 'Smart Fallback used' in hybrid
-assert 'RELEASE_VERSION: 2.1.0' in workflow
-assert 'RELEASE_TITLE: AuroraRevit v2.1.0 - Unified Hybrid AI Installer' in workflow
+assert 'RELEASE_VERSION: 2.1.1' in workflow
+assert 'RELEASE_TITLE: AuroraRevit v2.1.1 - Hybrid Fallback and Proxy Startup Fix' in workflow
 assert 'Verify runtime prerequisites' in workflow
 assert 'Verify installer prerequisites' in workflow
 assert 'OpenAI Cloud' in readme
 assert 'Ollama Local' in readme
 assert 'AURORA_AI_PROVIDER' in readme
-assert 'v2.1.0' in readme
+assert 'v2.1.1' in readme
 
 print("validated_buttons={}".format(len(buttons)))
-print("validated_version=2.1.0")
+print("validated_version=2.1.1")
 print("validated_hybrid_client=PASS")
 print("validated_provider_ui=PASS")
 print("validated_installer_shortcuts=PASS")
