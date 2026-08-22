@@ -49,7 +49,10 @@ def ollama_endpoint():
     value = os.environ.get("AURORA_OLLAMA_ENDPOINT", "").strip()
     if not value:
         value = str(_settings().get("ollama_endpoint", DEFAULT_ENDPOINT)).strip()
-    return (value or DEFAULT_ENDPOINT).rstrip("/")
+    value = (value or DEFAULT_ENDPOINT).rstrip("/")
+    if value.lower().endswith("/api"):
+        value = value[:-4].rstrip("/")
+    return value
 
 
 def ollama_model():

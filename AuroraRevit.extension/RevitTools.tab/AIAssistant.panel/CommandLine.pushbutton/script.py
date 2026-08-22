@@ -288,6 +288,54 @@ class CommandLinePanel(forms.WPFPanel if forms else object):
         _show(_last_log_entry(), title="Last Command Log Entry")
 
 
+def _open_fallback_window(reason):
+    if not forms:
+        return None
+    xaml = """
+    <Window xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"
+            Title=\"Aurora Command Line\" Width=\"620\" Height=\"150\"
+            WindowStartupLocation=\"CenterOwner\" Background=\"#FF1E1E1E\">
+      <Grid Margin=\"12\">
+        <Grid.RowDefinitions><RowDefinition Height=\"Auto\"/><RowDefinition Height=\"Auto\"/><RowDefinition Height=\"Auto\"/></Grid.RowDefinitions>
+        <TextBlock Grid.Row=\"0\" Name=\"StatusText\" Foreground=\"White\" Text=\"Command Line fallback window\" Margin=\"0,0,0,8\"/>
+        <Grid Grid.Row=\"1\"><Grid.ColumnDefinitions><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"80\"/></Grid.ColumnDefinitions>
+          <TextBox Grid.Column=\"0\" Name=\"CommandInput\" Height=\"30\" Background=\"#FF2D2D2D\" Foreground=\"White\"/>
+          <Button Grid.Column=\"1\" Name=\"SendButton\" Content=\"Send\" Width=\"80\" Height=\"30\" Background=\"#FF0078D4\" Margin=\"8,0,0,0\"/>
+        </Grid>
+        <TextBlock Grid.Row=\"2\" Name=\"FallbackText\" Foreground=\"#FFB9C3D2\" TextWrapping=\"Wrap\" Margin=\"0,8,0,0\"/>
+      </Grid>
+    </Window>
+    """
+    window = forms.WPFWindow(xaml, literal_string=True)
+    window.StatusText.Text = "Dockable pane unavailable; using a safe temporary window."
+    window.FallbackText.Text = str(reason)
+
+    def send(_sender, _args):
+        prompt = str(window.CommandInput.Text or "").strip()
+        if not prompt:
+            window.FallbackText.Text = "Type a command first."
+            return
+        window.SendButton.IsEnabled = False
+        try:
+            result = _invoke_engine(prompt)
+            if isinstance(result, dict) and str(result.get("type", "info")) == "code":
+                _review_code(result.get("content", ""))
+                window.FallbackText.Text = "Safe Preview opened for the generated code."
+            elif isinstance(result, dict):
+                window.FallbackText.Text = str(result.get("message", result.get("query", result)))
+            else:
+                window.FallbackText.Text = str(result)
+            _log_command(prompt)
+        except Exception as error:
+            window.FallbackText.Text = "Command failed: " + str(error)
+        finally:
+            window.SendButton.IsEnabled = True
+
+    window.SendButton.Click += send
+    window.show_dialog()
+    return True
+
+
 def _open_panel():
     if not forms:
         return None
@@ -303,16 +351,14 @@ def _open_panel():
         except Exception as error:
             detail = "Dockable panel registration failed: " + str(error)
             IMPORT_ERRORS["dockable_panel"] = detail
-            _show(detail, title="Aurora Command Line")
-            return None
+            return _open_fallback_window(detail)
     try:
         forms.open_dockable_panel(CommandLinePanel)
         return True
     except Exception as error:
-        detail = "Dockable panel was registered but could not be opened: " + str(error)
+        detail = "Dockable pane is not available in this Revit session: " + str(error)
         IMPORT_ERRORS["dockable_panel"] = detail
-        _show(detail, title="Aurora Command Line")
-        return None
+        return _open_fallback_window(detail)
 
 
 if __name__ == "__main__":

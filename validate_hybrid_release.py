@@ -47,6 +47,7 @@ assert "EnsureRunningAsync" in hybrid
 assert "FindOllamaExecutable" in hybrid
 assert "ollama.com/download/windows" in hybrid
 assert "GetActiveBaseUrlAsync" in hybrid
+assert "NormalizeOllamaEndpoint" in hybrid
 
 pane = (root / "RevitAddin" / "AuroraDockablePaneControl.xaml.cs").read_text(encoding="utf-8")
 assert "ProviderComboBox_SelectionChanged" in pane
@@ -71,7 +72,12 @@ for button in buttons:
     assert button + '\\*' in installer, button
     assert button in workflow, button
 assert 'UtilityTools\\*' in installer
-assert 'UtilityTools\\ai_router.py' in workflow
+assert "UtilityTools\\ai_router.py" in workflow
+command_logger = (panel / "CommandLogger.pushbutton" / "script.py").read_text(encoding="utf-8")
+command_line = (panel / "CommandLine.pushbutton" / "script.py").read_text(encoding="utf-8")
+assert "PresentationFramework" in command_logger
+assert "WPF_AVAILABLE" in command_logger
+assert "_open_fallback_window" in command_line
 assert 'RELEASE_VERSION: 2.0.0' in workflow
 assert 'RELEASE_TITLE: AuroraRevit v2.0.0 - Unified Hybrid AI' in workflow
 assert 'OpenAI Cloud' in readme

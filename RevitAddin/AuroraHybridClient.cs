@@ -338,7 +338,7 @@ namespace AuroraRevit.RevitAddin
             var environment = Environment.GetEnvironmentVariable("AURORA_OLLAMA_ENDPOINT");
             if (!string.IsNullOrWhiteSpace(environment))
             {
-                return environment.Trim().TrimEnd('/');
+                return NormalizeOllamaEndpoint(environment);
             }
 
             try
@@ -347,7 +347,7 @@ namespace AuroraRevit.RevitAddin
                 if (settings.TryGetProperty("ollama_endpoint", out var endpoint)
                     && !string.IsNullOrWhiteSpace(endpoint.GetString()))
                 {
-                    return endpoint.GetString().Trim().TrimEnd('/');
+                    return NormalizeOllamaEndpoint(endpoint.GetString());
                 }
             }
             catch
@@ -356,6 +356,14 @@ namespace AuroraRevit.RevitAddin
             }
 
             return DefaultOllamaEndpoint;
+        }
+
+        private static string NormalizeOllamaEndpoint(string value)
+        {
+            var normalized = value.Trim().TrimEnd('/');
+            return normalized.EndsWith("/api", StringComparison.OrdinalIgnoreCase)
+                ? normalized.Substring(0, normalized.Length - 4).TrimEnd('/')
+                : normalized;
         }
 
         private static JsonElement ReadSettings()

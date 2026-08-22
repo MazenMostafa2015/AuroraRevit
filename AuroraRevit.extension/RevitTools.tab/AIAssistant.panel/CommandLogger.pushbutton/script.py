@@ -15,9 +15,25 @@ import os
 import re
 import subprocess
 
-from System.Windows import Window, Thickness
-from System.Windows.Controls import Button, StackPanel, TextBlock
-from System.Windows.Media import Brushes, SolidColorBrush, Color
+try:
+    import clr
+    clr.AddReference("PresentationFramework")
+    clr.AddReference("PresentationCore")
+    clr.AddReference("WindowsBase")
+    from System.Windows import Window, Thickness
+    from System.Windows.Controls import Button, StackPanel, TextBlock
+    from System.Windows.Media import Brushes, SolidColorBrush, Color
+    WPF_AVAILABLE = True
+except Exception:
+    Window = None
+    Thickness = None
+    Button = None
+    StackPanel = None
+    TextBlock = None
+    Brushes = None
+    SolidColorBrush = None
+    Color = None
+    WPF_AVAILABLE = False
 
 try:
     from pyrevit import forms
@@ -44,7 +60,7 @@ LOG_DIR = _configured_log_dir()
 XLSX_PATH = os.path.join(LOG_DIR, "CommandLog.xlsx")
 CSV_PATH = os.path.join(LOG_DIR, "CommandLog.csv")
 STATE_PATH = os.path.join(LOG_DIR, "CommandLog.state.json")
-ACCENT = SolidColorBrush(Color.FromRgb(0, 120, 212))
+ACCENT = SolidColorBrush(Color.FromRgb(0, 120, 212)) if WPF_AVAILABLE else None
 HEADERS = ["Command Name", "Current User", "Timestamp", "Revit Version", "Description/Translation"]
 
 COMMAND_TRANSLATIONS = {
@@ -231,6 +247,9 @@ def _show_message(message):
 
 def show_window():
     count = refresh_log()
+    if not WPF_AVAILABLE:
+        _show_message("Command logging is active, but the WPF assemblies could not be loaded. The log file is:\n\n" + (XLSX_PATH if os.path.isfile(XLSX_PATH) else CSV_PATH))
+        return
     window = Window()
     window.Title = "Aurora Command Logger"
     window.Width = 460
