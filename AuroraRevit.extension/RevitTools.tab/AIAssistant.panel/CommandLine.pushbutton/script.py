@@ -77,6 +77,16 @@ def _load_aichat():
     return _load_sibling_script("AIChat.pushbutton", "aurora_aichat_engine")
 
 
+def _load_router():
+    here = os.path.dirname(os.path.abspath(__file__))
+    panel = os.path.dirname(here)
+    path = os.path.join(panel, "UtilityTools", "ai_router.py")
+    if not os.path.isfile(path):
+        IMPORT_ERRORS["aurora_ai_router"] = "File not found: " + path
+        return None
+    return _load_script_module(path, "aurora_ai_router")
+
+
 def _proxy_health():
     if WebClient is None:
         return None
@@ -95,7 +105,34 @@ def _proxy_health():
     return None
 
 
+def _provider_health():
+    router = _load_router()
+    if router is not None:
+        try:
+            if router.provider() == "ollama":
+                client = WebClient()
+                try:
+                    client.DownloadString(router.ollama_endpoint() + "/api/tags")
+                    return "Ollama Local"
+                finally:
+                    client.Dispose()
+        except Exception:
+            return None
+    port = _proxy_health()
+    return "OpenAI Cloud / port {0}".format(port) if port else None
+
+
 def _invoke_engine(prompt):
+    router = _load_router()
+    if router is not None:
+        try:
+            result = router.smart_query(prompt)
+            if isinstance(result, dict):
+                return result
+            return {"type": "info", "message": str(result)}
+        except Exception as error:
+            return {"type": "info", "message": "Hybrid AI router error: " + str(error)}
+
     module = _load_aichat()
     if module is None:
         detail = IMPORT_ERRORS.get("aurora_aichat_engine", "unknown import error")
@@ -201,9 +238,9 @@ class CommandLinePanel(forms.WPFPanel if forms else object):
             self.SendButton.Click += self._send_clicked
             self.ExpandButton.Click += self._expand_clicked
             self.LastLogButton.Click += self._last_log_clicked
-            active_port = _proxy_health()
-            self.StatusText.Text = "AI/Proxy ready (port {0})".format(active_port) if active_port else "AI/Proxy unavailable"
-            self.StatusDot.Foreground = self._brush("#FF66CC66" if active_port else "#FFFF6B6B")
+            provider_status = _provider_health()
+            self.StatusText.Text = provider_status + " ready" if provider_status else "Selected provider unavailable"
+            self.StatusDot.Foreground = self._brush("#FF66CC66" if provider_status else "#FFFF6B6B")
 
     @staticmethod
     def _brush(value):
@@ -227,9 +264,9 @@ class CommandLinePanel(forms.WPFPanel if forms else object):
             _show("Selection request returned:\n\n" + str(result.get("query", "")))
         else:
             _show(str(result.get("message", result)))
-        active_port = _proxy_health()
-        self.StatusText.Text = "AI/Proxy ready (port {0})".format(active_port) if active_port else "AI/Proxy unavailable"
-        self.StatusDot.Foreground = self._brush("#FF66CC66" if active_port else "#FFFF6B6B")
+        provider_status = _provider_health()
+        self.StatusText.Text = provider_status + " ready" if provider_status else "Selected provider unavailable"
+        self.StatusDot.Foreground = self._brush("#FF66CC66" if provider_status else "#FFFF6B6B")
         self.SendButton.IsEnabled = True
 
     def _expand_clicked(self, _sender, _args):

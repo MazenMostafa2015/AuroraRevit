@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "AuroraRevit.extension", "RevitTools.tab", "AIAssistant.panel"))
 BUTTONS = {
+    "AIChat.pushbutton": ("AI Chat", "Open a quick Aurora chat prompt using the selected OpenAI Cloud or Ollama Local provider."),
     "CommandLogger.pushbutton": ("Command Logger", "Scan recent Revit journals and record command occurrences to Excel/CSV."),
     "CommandLine.pushbutton": ("Command Line", "Open the dockable Aurora AI command bar with proxy status and safe code review."),
     "CommandLogViewer.pushbutton": ("Command Log Viewer", "Review recent command-log entries and open the Aurora log folder."),

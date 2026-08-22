@@ -1,12 +1,12 @@
 # AuroraRevit
 
-An AI Assistant Add-in for Autodesk Revit 2023, 2024, and 2025 with 40 built-in discipline examples.
+An AI Assistant Add-in for Autodesk Revit 2023, 2024, and 2025 with 101 embedded discipline examples, OpenAI Cloud routing, and direct Ollama Local support.
 
-## Current release: v1.9.2 Revit-Tested Utility UX
+## Current release: v2.0.0 Unified Hybrid AI
 
-The latest release is **[AuroraRevit v1.9.2 — Revit-Tested Utility UX](https://github.com/MazenMostafa2015/AuroraRevit/releases/tag/v1.9.2)**. Download the Windows installer directly from the [release assets](https://github.com/MazenMostafa2015/AuroraRevit/releases/download/v1.9.2/AuroraRevit-Setup.exe). It includes the Revit-tested dockable command-line fix, safe example-preview fallback, improved cancellation handling, individual utility buttons, and per-button icons and tooltips.
+The latest release is **[AuroraRevit v2.0.0 — Unified Hybrid AI](https://github.com/MazenMostafa2015/AuroraRevit/releases/tag/v2.0.0)**. Download the Windows installer directly from the [release assets](https://github.com/MazenMostafa2015/AuroraRevit/releases/download/v2.0.0/AuroraRevit-Setup.exe). It includes the Revit-tested dockable command-line fix, safe example-preview fallback, improved cancellation handling, individual utility buttons, per-button icons and tooltips, and the unified OpenAI Cloud/Ollama Local provider architecture.
 
-The installer deploys pyRevit tools to `%APPDATA%\\pyRevit\\Extensions\\AuroraRevit.extension\\RevitTools.tab\\AIAssistant.panel` and creates **Aurora Command Tools** and **Aurora Utility Tools** desktop shortcuts that open `C:\\AuroraRevit_Logs`. The tagged [GitHub Actions build](https://github.com/MazenMostafa2015/AuroraRevit/actions) validates the staged extension payload, icons, descriptions, shared utility core, and XAML before compiling and publishing `AuroraRevit-Setup.exe`.
+The installer deploys the C# add-in, local proxy, AIChat compatibility button, command tools, utility tools, shared `ai_router.py`, and all ribbon metadata. pyRevit tools are installed to `%APPDATA%\\pyRevit\\Extensions\\AuroraRevit.extension\\RevitTools.tab\\AIAssistant.panel`. It creates **AuroraRevit AI (Cloud)**, **AuroraRevit AI (Local)**, **Aurora Command Tools**, and **Aurora Utility Tools** shortcuts. If Ollama is not detected, installation continues and offers the official download page. The tagged [GitHub Actions build](https://github.com/MazenMostafa2015/AuroraRevit/actions) validates the hybrid client, staged extension payload, icons, descriptions, shared router, and XAML before compiling and publishing `AuroraRevit-Setup.exe`.
 
 ## One-step installer for published releases
 
@@ -30,7 +30,7 @@ deploying AuroraRevit to Revit 2023 or 2024.
 > process AI queries. You may provide it securely when prompted, pass
 > `-OpenAiApiKey`, or configure `OpenAI__ApiKey` later for the current user.
 
-This solution uses the Aurora Relay pattern: a Revit add-in communicates with a local .NET 8 ASP.NET Core proxy over HTTP/SSE. The proxy calls OpenAI through the official `OpenAI` NuGet package and normalizes model output into the typed JSON action contract consumed by the add-in.
+This solution uses a hybrid Aurora Relay pattern. OpenAI Cloud requests travel through the local .NET 8 ASP.NET Core proxy over HTTP/SSE. Ollama Local requests travel directly from the Revit add-in or pyRevit router to `http://localhost:11434/api/chat`. Both paths normalize responses into the same typed JSON action contract consumed by the add-in. The shared provider setting is selected by `AURORA_AI_PROVIDER`, Quick Settings JSON, or the dockable pane dropdown.
 
 ## Solution layout
 
@@ -38,6 +38,8 @@ This solution uses the Aurora Relay pattern: a Revit add-in communicates with a 
 | --- | --- | --- |
 | `RevitAddin` | .NET Framework 4.8 | Revit `IExternalApplication`, dockable WPF pane, version gate, external command, and HTTP client |
 | `AiProxy` | .NET 8 | Local ASP.NET Core proxy with OpenAI chat completion, JSON action normalization, localhost CORS, prompt validation, and port fallback |
+| `RevitAddin/AuroraHybridClient.cs` | .NET Framework 4.8 / .NET 8 | Provider-neutral client that routes OpenAI through the proxy and Ollama directly through `/api/chat`, with settings and environment-variable resolution |
+| `UtilityTools/ai_router.py` | IronPython 2.7 | Standard-library pyRevit router for OpenAI proxy, direct Ollama, and Smart Fallback |
 | `AiProxy.Desktop` | .NET 8 WPF | Local proxy GUI with start/stop controls, health status, active endpoint, and live logs |
 
 ## Command Tools Edition
@@ -47,11 +49,12 @@ The AuroraRevit installer now deploys a complete pyRevit command-tools bundle to
 | Pushbutton | Purpose |
 | --- | --- |
 | `CommandLogger.pushbutton` | Scans recent Revit journal files and records command identifiers, Windows user, timestamp, Revit version, and an English translation in `C:\\AuroraRevit_Logs\\CommandLog.xlsx`, with CSV fallback. It tracks journal occurrences so repeated commands are not silently collapsed. |
-| `CommandLine.pushbutton` | Provides an AutoCAD-style command bar with AI/proxy status, Send, Expand Chat, Show Last Log Entry, direct sibling loading of the existing AIChat engine, and a read-only generated-code review window. |
+| `AIChat.pushbutton` | Compatibility chat entry point that uses the shared provider router and preserves the traditional AIChat path. |
+| `CommandLine.pushbutton` | Provides an AutoCAD-style dockable command bar with OpenAI Cloud/Ollama Local selection, provider health status, Send, Expand Chat, Show Last Log Entry, Smart Fallback, and read-only generated-code review. |
 | `CommandLogViewer.pushbutton` | Shows the latest log rows and opens the log folder for quick inspection. |
 | `CommandToolsStatus.pushbutton` | Diagnoses all installed buttons, Revit journal availability, log-folder readiness, and proxy ports 5000/5001. |
 | `ElementInspector.pushbutton` | Lets the user pick one element and inspect its read-only identity, category, type/family, coordinates, bounding box, and parameters. Escape is treated as a normal cancellation. |
-| `QuickSettings.pushbutton` | Saves the AI model, Ollama endpoint, log-folder, and light/dark preference per Windows user in a JSON settings file. |
+| `QuickSettings.pushbutton` | Saves provider, selected model, Ollama endpoint, log-folder, and light/dark preference per Windows user in a JSON settings file. |
 | `ExportToPDF.pushbutton` | Selects printable sheets/views, shows a Safe Preview, asks for confirmation, and submits the set through Revit `PrintManager` to the configured PDF printer. |
 | `ExportCurrentViewPDF.pushbutton` | Exports only the active view after selecting output settings and confirming a Safe Preview. |
 | `ExportScheduleExcel.pushbutton` | Exports the active schedule to formatted Excel, with CSV fallback when `openpyxl` is unavailable. |
@@ -64,7 +67,7 @@ The three expansion buttons were chosen because they cover common command-tool f
 
 Every visible pyRevit button now includes a `bundle.yaml` description and a lightweight `icon.png`, so the ribbon communicates each command’s purpose before it is opened. The old single-menu `UtilityTools.pushbutton` has been removed. Its shared IronPython core is stored in a non-button `UtilityTools` folder, while each utility is independently visible and launchable.
 
-The Windows installer creates desktop shortcuts named **Aurora Command Tools** and **Aurora Utility Tools**, both opening `C:\\AuroraRevit_Logs`. The GitHub Actions workflow stages and verifies each separate button, icon, tooltip, shared core, and XAML resource before compiling `AuroraRevit-Setup.exe` and publishing the v1.9.2 release.
+The Windows installer creates **AuroraRevit AI (Cloud)** and **AuroraRevit AI (Local)** launchers, plus **Aurora Command Tools** and **Aurora Utility Tools** log-folder shortcuts. The GitHub Actions workflow stages and verifies every button, icon, tooltip, shared core, provider router, and XAML resource before compiling `AuroraRevit-Setup.exe` and publishing the v2.0.0 release.
 
 ### Separate utility pushbuttons
 

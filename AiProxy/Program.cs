@@ -54,7 +54,7 @@ app.MapPost("/api/revit-query", async (RevitQueryRequest request, OpenAiChatServ
 
     try
     {
-        var modelResponse = await chatService.CompleteAsync(prompt);
+        var modelResponse = await chatService.CompleteAsync(prompt, request?.Model);
         var normalizedJson = OpenAiResponseNormalizer.Normalize(modelResponse);
         return Results.Content(normalizedJson, "application/json", Encoding.UTF8);
     }
@@ -103,7 +103,7 @@ app.MapPost("/api/revit-query/stream", async (HttpContext context, RevitQueryReq
 
     try
     {
-        await foreach (var delta in chatService.StreamAsync(prompt, context.RequestAborted))
+        await foreach (var delta in chatService.StreamAsync(prompt, request?.Model, context.RequestAborted))
         {
             await WriteSseEventAsync(context.Response, new { type = "delta", text = delta }, context.RequestAborted);
         }
@@ -158,7 +158,8 @@ static bool IsLocalOrigin(string origin)
 }
 
 public sealed record RevitQueryRequest(
-    [property: JsonPropertyName("prompt")] string Prompt);
+    [property: JsonPropertyName("prompt")] string Prompt,
+    [property: JsonPropertyName("model")] string Model);
 
 public static class OpenAiResponseNormalizer
 {

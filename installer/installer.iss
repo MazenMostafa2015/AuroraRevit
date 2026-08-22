@@ -1,6 +1,6 @@
 #define MyAppName "AuroraRevit AI Assistant"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.9.2"
+  #define MyAppVersion "2.0.0"
 #endif
 
 [Setup]
@@ -25,12 +25,14 @@ Uninstallable=yes
 [Files]
 Source: "payload\common\AiProxyGui\*"; DestDir: "{app}\AiProxyGui"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\common\AiProxy\*"; DestDir: "{app}\AiProxy"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "OllamaLauncher.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "payload\Revit2023\Release\RevitAddin\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2023"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRevit2023Installed
 Source: "payload\Revit2023\publish\Manifests\Revit2023\AuroraRevit.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2023"; DestName: "AuroraRevit.addin"; Flags: ignoreversion; Check: IsRevit2023Installed
 Source: "payload\Revit2024\Release\RevitAddin\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2024"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRevit2024Installed
 Source: "payload\Revit2024\publish\Manifests\Revit2024\AuroraRevit.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2024"; DestName: "AuroraRevit.addin"; Flags: ignoreversion; Check: IsRevit2024Installed
 Source: "payload\Revit2025\Release\RevitAddin\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2025"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRevit2025Installed
 Source: "payload\Revit2025\publish\Manifests\Revit2025\AuroraRevit.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2025"; DestName: "AuroraRevit.addin"; Flags: ignoreversion; Check: IsRevit2025Installed
+Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\AIChat.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\AIChat.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLine.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "payload\pyRevit\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton\*"; DestDir: "{userappdata}\pyRevit\Extensions\AuroraRevit.extension\RevitTools.tab\AIAssistant.panel\CommandLogViewer.pushbutton"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -51,6 +53,8 @@ Name: "C:\AuroraRevit_Logs"
 
 [Icons]
 Name: "{autodesktop}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
+Name: "{autodesktop}\AuroraRevit AI (Cloud)"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "Start AuroraRevit with the OpenAI Cloud proxy"
+Name: "{autodesktop}\AuroraRevit AI (Local)"; Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File \"{app}\OllamaLauncher.ps1\""; WorkingDir: "{app}"; Comment: "Start or install Ollama Local for AuroraRevit"
 Name: "{autodesktop}\Aurora Command Tools"; Filename: "{sys}\explorer.exe"; Parameters: "C:\AuroraRevit_Logs"; WorkingDir: "C:\AuroraRevit_Logs"; Comment: "Open AuroraRevit command logs"
 Name: "{autodesktop}\Aurora Utility Tools"; Filename: "{sys}\explorer.exe"; Parameters: "C:\AuroraRevit_Logs"; WorkingDir: "C:\AuroraRevit_Logs"; Comment: "Open AuroraRevit utility logs"
 Name: "{group}\AuroraRevit Proxy"; Filename: "{app}\AiProxyGui\AuroraRevit.ProxyGui.exe"; WorkingDir: "{app}\AiProxyGui"; Comment: "AuroraRevit local AI proxy"
@@ -95,6 +99,12 @@ begin
   Result := IsRevitYearInstalled('2025');
 end;
 
+function IsOllamaInstalled(): Boolean;
+begin
+  Result := FileExists(ExpandConstant('{localappdata}\Programs\Ollama\ollama.exe'))
+    or FileExists(ExpandConstant('{autopf}\Ollama\ollama.exe'));
+end;
+
 function DetectInstalledYears(): String;
 var
   Year: Integer;
@@ -120,6 +130,16 @@ begin
     exit;
   end;
   Result := True;
+end;
+
+procedure OfferOllamaDownload();
+var
+  ErrorCode: Integer;
+begin
+  if IsOllamaInstalled() then
+    exit;
+  if MsgBox('Ollama was not detected. Open the official Ollama download page now? AuroraRevit will continue to install normally.', mbInformation, MB_YESNO) = IDYES then
+    ShellExec('open', 'https://ollama.com/download/windows', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
 end;
 
 function ReplaceAssemblyPaths(Content: AnsiString; AssemblyPath: String): AnsiString;
@@ -181,6 +201,7 @@ var
 begin
   if CurStep <> ssPostInstall then
     exit;
+  OfferOllamaDownload();
   Years := InstalledYears;
   while Years <> '' do begin
     SeparatorPos := Pos(';', Years);

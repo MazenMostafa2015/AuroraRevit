@@ -22,8 +22,8 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   CONFIGURATION: Release
-  RELEASE_VERSION: 1.9.2
-  RELEASE_TITLE: AuroraRevit v1.9.2 - Revit Tested Utility UX
+  RELEASE_VERSION: 2.0.0
+  RELEASE_TITLE: AuroraRevit v2.0.0 - Unified Hybrid AI
 
 jobs:
   build:
@@ -144,6 +144,9 @@ jobs:
           New-Item -ItemType Directory -Path $staged -Force | Out-Null
           Copy-Item (Join-Path $source '*') $staged -Recurse -Force
           $required = @(
+            'RevitTools.tab\AIAssistant.panel\AIChat.pushbutton\script.py',
+            'RevitTools.tab\AIAssistant.panel\AIChat.pushbutton\bundle.yaml',
+            'RevitTools.tab\AIAssistant.panel\AIChat.pushbutton\icon.png',
             'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\bundle.yaml',
             'RevitTools.tab\AIAssistant.panel\CommandLogger.pushbutton\icon.png',
@@ -156,6 +159,7 @@ jobs:
             'RevitTools.tab\AIAssistant.panel\QuickSettings.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\ExportToPDF.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\UtilityTools\utility_core.py',
+            'RevitTools.tab\AIAssistant.panel\UtilityTools\ai_router.py',
             'RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton\script.py',
             'RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton\bundle.yaml',
             'RevitTools.tab\AIAssistant.panel\ExportCurrentViewPDF.pushbutton\icon.png',
@@ -171,6 +175,7 @@ jobs:
             if (-not (Test-Path $path)) { throw "Missing pyRevit command-tool resource: $path" }
           }
           $buttonFolders = @(
+            'AIChat.pushbutton',
             'CommandLogger.pushbutton',
             'CommandLine.pushbutton',
             'CommandLogViewer.pushbutton',
@@ -281,8 +286,9 @@ jobs:
             AuroraRevit Command Tools Edition.
 
             Included pyRevit buttons:
+            - AIChat: compatibility chat entry point using the selected hybrid provider.
             - CommandLogger: journal command logging to Excel/CSV.
-            - CommandLine: dockable AI command bar with code review.
+            - CommandLine: dockable hybrid AI command bar with provider status and code review.
             - CommandLogViewer: recent log inspection and folder access.
             - CommandToolsStatus: installation and proxy diagnostics.
             - ElementInspector: read-only element parameters and geometry preview.
@@ -290,6 +296,6 @@ jobs:
             - ExportToPDF: safe-preview sheet/view export through Revit PrintManager.
             - ExportCurrentViewPDF, ExportScheduleExcel, BatchParameterTranslator, PerformanceMode, RestorePerformanceMode, and SmartSafetyDetailer: separate visible utility pushbuttons with individual icons, tooltips, and Safe Preview boundaries.
 
-            The installer also creates the Aurora Command Tools and Aurora Utility Tools desktop shortcuts.
+            The installer includes both OpenAI Cloud and Ollama Local routing, creates AuroraRevit AI (Cloud) and AuroraRevit AI (Local) shortcuts, and offers the official Ollama download page when Ollama is not installed.
           generate_release_notes: true
           files: release-assets/AuroraRevit-Setup.exe

@@ -13,6 +13,7 @@ namespace AuroraRevit.RevitAddin
     public partial class AuroraDockablePaneControl : UserControl
     {
         private readonly AuroraProxyClient _proxyClient;
+        private readonly AuroraHybridClient _hybridClient;
         private readonly RevitActionHandler _revitActionHandler;
         private CancellationTokenSource _streamCancellation;
         private readonly StringBuilder _actionLog = new StringBuilder();
@@ -23,9 +24,12 @@ namespace AuroraRevit.RevitAddin
         {
             InitializeComponent();
             _proxyClient = new AuroraProxyClient();
+            _hybridClient = new AuroraHybridClient();
             _revitActionHandler = new RevitActionHandler();
+            ProviderComboBox.SelectedIndex = _hybridClient.Provider == AuroraAiProvider.Ollama ? 1 : 0;
             LoadExampleLibrary();
-            AddAssistantMessage("Hello. I’m Aurora, your Revit AI Assistant. Ask me a question to test the local proxy connection.");
+            AddAssistantMessage("Hello. I’m Aurora, your Revit AI Assistant. Choose OpenAI Cloud or Ollama Local, then ask me a question.");
+            _ = RefreshProviderStatusAsync();
         }
 
         private async void CompactSendButton_Click(object sender, RoutedEventArgs e)
@@ -137,6 +141,39 @@ namespace AuroraRevit.RevitAddin
             await SendPromptAsync();
         }
 
+        private async void ProviderComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_hybridClient == null || ProviderComboBox.SelectedIndex < 0)
+            {
+                return;
+            }
+
+            _hybridClient.Provider = ProviderComboBox.SelectedIndex == 1
+                ? AuroraAiProvider.Ollama
+                : AuroraAiProvider.OpenAI;
+            AppendActionLog("PROVIDER", _hybridClient.Provider == AuroraAiProvider.Ollama ? "Ollama Local selected." : "OpenAI Cloud selected.");
+            await RefreshProviderStatusAsync();
+        }
+
+        private async System.Threading.Tasks.Task RefreshProviderStatusAsync()
+        {
+            if (_hybridClient == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var status = await _hybridClient.GetStatusAsync();
+                ProxyStatusText.Text = "  " + status;
+            }
+            catch (Exception exception)
+            {
+                ProxyStatusText.Text = "  Provider status unavailable";
+                ProxyStatusText.ToolTip = exception.Message;
+            }
+        }
+
         private async void PromptTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter && Keyboard.Modifiers != ModifierKeys.Shift)
@@ -166,7 +203,7 @@ namespace AuroraRevit.RevitAddin
 
             try
             {
-                await _proxyClient.StreamQueryAsync(
+                await _hybridClient.StreamQueryAsync(
                     prompt,
                     streamEvent =>
                     {
@@ -201,7 +238,7 @@ namespace AuroraRevit.RevitAddin
             }
             catch (Exception exception)
             {
-                var friendly = FriendlyError(exception.Message);
+                var friendly = FriendlyError(exception.Message, _hybridClient.Provider);
                 SetMessageText(assistantBubble, friendly);
                 AppendActionLog("ERROR", exception.Message);
                 ShowToast(assistantBubble.Text);
@@ -402,13 +439,18 @@ namespace AuroraRevit.RevitAddin
                 .Append(type ?? "INFO").Append(" | ").AppendLine(message ?? string.Empty);
         }
 
-        private static string FriendlyError(string message)
+        private static string FriendlyError(string message, AuroraAiProvider provider)
         {
             var value = message ?? string.Empty;
+            if (provider == AuroraAiProvider.Ollama)
+            {
+                if (value.IndexOf("ollama", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("11434", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("connection", StringComparison.OrdinalIgnoreCase) >= 0)
+                    return "Aurora cannot reach Ollama Local. Start Ollama and verify its endpoint at http://localhost:11434.";
+            }
             if (value.IndexOf("401", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("api key", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "Aurora could not authenticate with the AI provider. Check the OpenAI API key in the local proxy settings, then try again.";
+                return "Aurora could not authenticate with OpenAI Cloud. Check the OpenAI API key in the local proxy settings, then try again.";
             if (value.IndexOf("localhost", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("connection", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "Aurora cannot reach the local proxy. Start Aurora Revit Proxy and verify its Running endpoint on port 5001 (the add-in also checks port 5000).";
+                return "Aurora cannot reach the selected local provider. Check the provider status indicator and start the required local service.";
             return "Aurora could not complete that request. Review the prompt and active Revit document, then try again.\n\nDetails: " + value;
         }
 

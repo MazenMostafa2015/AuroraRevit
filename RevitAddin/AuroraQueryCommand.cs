@@ -62,14 +62,14 @@ namespace AuroraRevit.RevitAddin
             };
         }
 
-        public async Task<RevitQueryResponse> SendQueryAsync(string prompt)
+        public async Task<RevitQueryResponse> SendQueryAsync(string prompt, string model = null)
         {
             if (string.IsNullOrWhiteSpace(prompt))
             {
                 throw new ArgumentException("Prompt cannot be empty.", nameof(prompt));
             }
 
-            var payload = JsonSerializer.Serialize(new RevitQueryRequest { Prompt = prompt }, JsonOptions);
+            var payload = JsonSerializer.Serialize(new RevitQueryRequest { Prompt = prompt, Model = model }, JsonOptions);
             var endpoint = (await ResolveBaseUrlAsync().ConfigureAwait(false)) + QueryPath;
             using (var content = new StringContent(payload, Encoding.UTF8, "application/json"))
             using (var response = await _httpClient.PostAsync(endpoint, content).ConfigureAwait(false))
@@ -83,6 +83,11 @@ namespace AuroraRevit.RevitAddin
 
                 return DeserializeResponse(json);
             }
+        }
+
+        public async Task<string> GetActiveBaseUrlAsync()
+        {
+            return await ResolveBaseUrlAsync().ConfigureAwait(false);
         }
 
         private async Task<string> ResolveBaseUrlAsync()
@@ -134,7 +139,8 @@ namespace AuroraRevit.RevitAddin
         public async Task StreamQueryAsync(
             string prompt,
             Action<AuroraSseEvent> onEvent,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            string model = null)
         {
             if (string.IsNullOrWhiteSpace(prompt))
             {
@@ -146,7 +152,7 @@ namespace AuroraRevit.RevitAddin
                 throw new ArgumentNullException(nameof(onEvent));
             }
 
-            var payload = JsonSerializer.Serialize(new RevitQueryRequest { Prompt = prompt }, JsonOptions);
+            var payload = JsonSerializer.Serialize(new RevitQueryRequest { Prompt = prompt, Model = model }, JsonOptions);
             var endpoint = (await ResolveBaseUrlAsync().ConfigureAwait(false)) + StreamQueryPath;
             using (var request = new HttpRequestMessage(HttpMethod.Post, endpoint))
             using (var content = new StringContent(payload, Encoding.UTF8, "application/json"))
@@ -211,6 +217,7 @@ namespace AuroraRevit.RevitAddin
     public sealed class RevitQueryRequest
     {
         public string Prompt { get; set; }
+        public string Model { get; set; }
     }
 
     public sealed class RevitQueryResponse

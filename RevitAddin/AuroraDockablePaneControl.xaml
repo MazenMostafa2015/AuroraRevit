@@ -84,7 +84,14 @@
                     </StackPanel>
                     <StackPanel>
                         <TextBlock Text="Aurora Assistant" Foreground="{StaticResource PrimaryText}" FontSize="15" FontWeight="SemiBold" />
-                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0"><Ellipse Width="7" Height="7" Fill="#54D69A" /><TextBlock x:Name="ProxyStatusText" Text="  Local proxy ready" Foreground="{StaticResource SecondaryText}" FontSize="11" /></StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0"><Ellipse Width="7" Height="7" Fill="#54D69A" /><TextBlock x:Name="ProxyStatusText" Text="  Provider status pending" Foreground="{StaticResource SecondaryText}" FontSize="11" /></StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
+                            <TextBlock Text="AI Provider:" Foreground="{StaticResource SecondaryText}" FontSize="10" VerticalAlignment="Center" />
+                            <ComboBox x:Name="ProviderComboBox" Width="116" Height="25" Margin="8,0,0,0" SelectionChanged="ProviderComboBox_SelectionChanged" ToolTip="Choose OpenAI Cloud through the local proxy or direct Ollama Local.">
+                                <ComboBoxItem Content="OpenAI Cloud" Tag="openai" />
+                                <ComboBoxItem Content="Ollama Local" Tag="ollama" />
+                            </ComboBox>
+                        </StackPanel>
                     </StackPanel>
                 </DockPanel>
             </Border>

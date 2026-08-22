@@ -26,22 +26,24 @@ public sealed class OpenAiChatService
         "Never reject ducts, pipes, or cable_trays. Do not add markdown formatting to the JSON.";
 
     private readonly ChatClient? _chatClient;
+    private readonly string _apiKey;
+    private readonly string _defaultModel;
     private readonly bool _isConfigured;
     private readonly string _configurationMessage;
 
     public OpenAiChatService(IOptions<OpenAiOptions> options)
     {
         var resolvedOptions = options.Value;
-        _isConfigured = ProxyValidation.IsValidApiKey(resolvedOptions.ApiKey);
+        _apiKey = resolvedOptions.ApiKey?.Trim() ?? string.Empty;
+        _defaultModel = string.IsNullOrWhiteSpace(resolvedOptions.Model) ? "gpt-4o-mini" : resolvedOptions.Model.Trim();
+        _isConfigured = ProxyValidation.IsValidApiKey(_apiKey);
         _configurationMessage = _isConfigured
             ? "OpenAI is configured."
             : "OpenAI API key is missing or has an invalid format. Set OpenAI:ApiKey through user-secrets or OpenAI__ApiKey.";
 
         if (_isConfigured)
         {
-            _chatClient = new ChatClient(
-                string.IsNullOrWhiteSpace(resolvedOptions.Model) ? "gpt-4o-mini" : resolvedOptions.Model.Trim(),
-                resolvedOptions.ApiKey.Trim());
+            _chatClient = new ChatClient(_defaultModel, _apiKey);
         }
     }
 
@@ -51,6 +53,7 @@ public sealed class OpenAiChatService
 
     public async IAsyncEnumerable<string> StreamAsync(
         string prompt,
+        string modelOverride = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         if (!IsConfigured)
@@ -64,7 +67,8 @@ public sealed class OpenAiChatService
             new UserChatMessage(prompt)
         };
 
-        await foreach (var update in _chatClient!.CompleteChatStreamingAsync(messages).WithCancellation(cancellationToken))
+        var client = ResolveClient(modelOverride);
+        await foreach (var update in client.CompleteChatStreamingAsync(messages).WithCancellation(cancellationToken))
         {
             foreach (var contentUpdate in update.ContentUpdate)
             {
@@ -76,7 +80,7 @@ public sealed class OpenAiChatService
         }
     }
 
-    public async Task<string> CompleteAsync(string prompt)
+    public async Task<string> CompleteAsync(string prompt, string modelOverride = null)
     {
         if (!IsConfigured)
         {
@@ -89,7 +93,7 @@ public sealed class OpenAiChatService
             new UserChatMessage(prompt)
         };
 
-        var completionResult = await _chatClient!.CompleteChatAsync(messages);
+        var completionResult = await ResolveClient(modelOverride).CompleteChatAsync(messages);
         var completion = completionResult.Value;
         if (completion.Content.Count == 0 || string.IsNullOrWhiteSpace(completion.Content[0].Text))
         {
@@ -97,5 +101,15 @@ public sealed class OpenAiChatService
         }
 
         return completion.Content[0].Text.Trim();
+    }
+
+    private ChatClient ResolveClient(string modelOverride)
+    {
+        if (!string.IsNullOrWhiteSpace(modelOverride) && !string.Equals(modelOverride.Trim(), _defaultModel, StringComparison.OrdinalIgnoreCase))
+        {
+            return new ChatClient(modelOverride.Trim(), _apiKey);
+        }
+
+        return _chatClient!;
     }
 }
