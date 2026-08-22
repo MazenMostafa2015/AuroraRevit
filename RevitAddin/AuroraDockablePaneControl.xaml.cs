@@ -222,7 +222,7 @@ namespace AuroraRevit.RevitAddin
 
                 if (!string.IsNullOrWhiteSpace(streamError))
                 {
-                    SetMessageText(assistantBubble, FriendlyError(streamError));
+                    SetMessageText(assistantBubble, FriendlyError(streamError, _hybridClient.Provider));
                     AppendActionLog("ERROR", streamError);
                 }
                 else
