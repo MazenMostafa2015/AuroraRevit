@@ -447,11 +447,23 @@ namespace AuroraRevit.RevitAddin
                 if (value.IndexOf("ollama", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("11434", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("connection", StringComparison.OrdinalIgnoreCase) >= 0)
                     return "Aurora cannot reach Ollama Local. Start Ollama and verify its endpoint at http://localhost:11434.";
             }
-            if (value.IndexOf("401", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("api key", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "Aurora could not authenticate with OpenAI Cloud. Check the OpenAI API key in the local proxy settings, then try again.";
+            if (value.IndexOf("401", StringComparison.OrdinalIgnoreCase) >= 0
+                || value.IndexOf("unauthorized", StringComparison.OrdinalIgnoreCase) >= 0
+                || value.IndexOf("api key", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "Aurora could not authenticate with OpenAI Cloud. Check OpenAI__ApiKey or the proxy user-secrets configuration, then restart the proxy.";
+            if (value.IndexOf("429", StringComparison.OrdinalIgnoreCase) >= 0
+                || value.IndexOf("rate limit", StringComparison.OrdinalIgnoreCase) >= 0
+                || value.IndexOf("quota", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "OpenAI rejected the request because the account quota or rate limit was reached. Check the OpenAI account and try again later.";
+            if (value.IndexOf("502", StringComparison.OrdinalIgnoreCase) >= 0
+                || value.IndexOf("bad gateway", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "The Aurora proxy is running, but OpenAI rejected or could not complete the upstream request. Check the proxy log, API key, model name, network access, and billing/quota status.";
+            if (value.IndexOf("timeout", StringComparison.OrdinalIgnoreCase) >= 0
+                || value.IndexOf("timed out", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "The provider request timed out. Check the local service status, model availability, network access, and proxy log, then try a shorter prompt.";
             if (value.IndexOf("localhost", StringComparison.OrdinalIgnoreCase) >= 0 || value.IndexOf("connection", StringComparison.OrdinalIgnoreCase) >= 0)
                 return "Aurora cannot reach the selected local provider. Check the provider status indicator and start the required local service.";
-            return "Aurora could not complete that request. Review the prompt and active Revit document, then try again.\n\nDetails: " + value;
+            return "Aurora could not complete that request. Review the provider status and proxy log, then try again.\n\nDetails: " + value;
         }
 
         private void SetLoading(bool isLoading)

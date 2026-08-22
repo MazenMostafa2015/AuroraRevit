@@ -78,6 +78,9 @@ command_line = (panel / "CommandLine.pushbutton" / "script.py").read_text(encodi
 assert "PresentationFramework" in command_logger
 assert "WPF_AVAILABLE" in command_logger
 assert "_open_fallback_window" in command_line
+assert '502' in pane
+assert 'quota' in pane
+assert 'upstream' in (root / "AiProxy" / "Program.cs").read_text(encoding="utf-8")
 assert 'RELEASE_VERSION: 2.1.0' in workflow
 assert 'RELEASE_TITLE: AuroraRevit v2.1.0 - Unified Hybrid AI Installer' in workflow
 assert 'Verify runtime prerequisites' in workflow

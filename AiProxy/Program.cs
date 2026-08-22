@@ -138,7 +138,28 @@ static string SafeProviderError(Exception exception)
         return "OpenAI rejected the configured API key. Check OpenAI:ApiKey or OpenAI__ApiKey.";
     }
 
-    return "The OpenAI request failed. Check the proxy logs for details.";
+    if (message.Contains("429", StringComparison.OrdinalIgnoreCase)
+        || message.Contains("rate limit", StringComparison.OrdinalIgnoreCase)
+        || message.Contains("quota", StringComparison.OrdinalIgnoreCase))
+    {
+        return "OpenAI rejected the request because the account quota or rate limit was reached. Check the OpenAI account and proxy logs.";
+    }
+
+    if (message.Contains("404", StringComparison.OrdinalIgnoreCase)
+        || message.Contains("model", StringComparison.OrdinalIgnoreCase)
+            && message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+    {
+        return "OpenAI could not find the configured model. Check OpenAI:Model or OpenAI__Model in the proxy configuration.";
+    }
+
+    if (message.Contains("timeout", StringComparison.OrdinalIgnoreCase)
+        || message.Contains("timed out", StringComparison.OrdinalIgnoreCase)
+        || message.Contains("connection", StringComparison.OrdinalIgnoreCase))
+    {
+        return "The proxy could not reach OpenAI. Check network access, proxy logs, firewall rules, and the configured API endpoint.";
+    }
+
+    return "The OpenAI request failed upstream. Check the proxy logs, API key, model, network access, and account quota.";
 }
 
 static async Task WriteSseEventAsync(HttpResponse response, object payload, CancellationToken cancellationToken)

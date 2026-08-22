@@ -78,7 +78,7 @@ namespace AuroraRevit.RevitAddin
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new InvalidOperationException(
-                        $"Proxy returned {(int)response.StatusCode}: {json}");
+                        $"Proxy returned {(int)response.StatusCode}: {ExtractProxyMessage(json)}");
                 }
 
                 return DeserializeResponse(json);
@@ -122,6 +122,40 @@ namespace AuroraRevit.RevitAddin
 
             throw new InvalidOperationException(
                 "Aurora proxy is not reachable on localhost:5001 or localhost:5000. Start Aurora Revit Proxy and verify its Running endpoint.");
+        }
+
+        private static string ExtractProxyMessage(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return "The local proxy returned an empty error response.";
+            }
+
+            try
+            {
+                using (var document = JsonDocument.Parse(json))
+                {
+                    var root = document.RootElement;
+                    if (root.TryGetProperty("message", out var message)
+                        && message.ValueKind == JsonValueKind.String
+                        && !string.IsNullOrWhiteSpace(message.GetString()))
+                    {
+                        return message.GetString();
+                    }
+                    if (root.TryGetProperty("error", out var error)
+                        && error.ValueKind == JsonValueKind.String
+                        && !string.IsNullOrWhiteSpace(error.GetString()))
+                    {
+                        return error.GetString();
+                    }
+                }
+            }
+            catch (JsonException)
+            {
+                // Preserve a short non-JSON proxy response for diagnostics.
+            }
+
+            return json.Length > 600 ? json.Substring(0, 600) : json;
         }
 
         public RevitQueryResponse DeserializeResponse(string json)
