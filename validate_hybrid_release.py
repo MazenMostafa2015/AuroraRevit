@@ -40,6 +40,7 @@ assert 'Content="Ollama Local"' in xaml_text
 assert 'x:Name="StatusText"' in panel_xaml_text or 'Name="StatusText"' in panel_xaml_text
 
 hybrid = (root / "RevitAddin" / "AuroraHybridClient.cs").read_text(encoding="utf-8")
+router_text = (panel / "UtilityTools" / "ai_router.py").read_text(encoding="utf-8")
 assert "class AuroraHybridClient" in hybrid
 assert "localhost:11434/api/chat" in hybrid or "api/chat" in hybrid
 assert "AURORA_AI_PROVIDER" in hybrid
@@ -81,6 +82,10 @@ assert "_open_fallback_window" in command_line
 assert '502' in pane
 assert 'quota' in pane
 assert 'upstream' in (root / "AiProxy" / "Program.cs").read_text(encoding="utf-8")
+assert 'AURORA_OLLAMA_MODEL' in router_text
+assert 'AURORA_OLLAMA_MODEL' in hybrid
+assert 'StreamWithProviderAsync' in hybrid
+assert 'Smart Fallback used' in hybrid
 assert 'RELEASE_VERSION: 2.1.0' in workflow
 assert 'RELEASE_TITLE: AuroraRevit v2.1.0 - Unified Hybrid AI Installer' in workflow
 assert 'Verify runtime prerequisites' in workflow

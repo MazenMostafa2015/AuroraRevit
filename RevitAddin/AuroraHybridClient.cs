@@ -45,17 +45,55 @@ namespace AuroraRevit.RevitAddin
             get { return _provider == AuroraAiProvider.Ollama ? _ollamaClient.Endpoint : "http://localhost:5001 or http://localhost:5000"; }
         }
 
-        public Task StreamQueryAsync(
+        public async Task StreamQueryAsync(
             string prompt,
             Action<AuroraSseEvent> onEvent,
             CancellationToken cancellationToken)
         {
-            if (_provider == AuroraAiProvider.Ollama)
+            try
+            {
+                await StreamWithProviderAsync(_provider, prompt, onEvent, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception primaryError) when (!cancellationToken.IsCancellationRequested)
+            {
+                var alternate = _provider == AuroraAiProvider.Ollama
+                    ? AuroraAiProvider.OpenAI
+                    : AuroraAiProvider.Ollama;
+                try
+                {
+                    await StreamWithProviderAsync(alternate, prompt, onEvent, cancellationToken).ConfigureAwait(false);
+                    onEvent(new AuroraSseEvent
+                    {
+                        Type = "fallback",
+                        Message = "Primary provider unavailable; Smart Fallback used " + alternate + "."
+                    });
+                }
+                catch (Exception alternateError)
+                {
+                    throw new InvalidOperationException(
+                        "Both Aurora AI providers are unavailable. Primary " + _provider + ": "
+                        + primaryError.Message + ". Alternate " + alternate + ": " + alternateError.Message,
+                        primaryError);
+                }
+            }
+        }
+
+        private Task StreamWithProviderAsync(
+            AuroraAiProvider provider,
+            string prompt,
+            Action<AuroraSseEvent> onEvent,
+            CancellationToken cancellationToken)
+        {
+            if (provider == AuroraAiProvider.Ollama)
             {
                 return _ollamaClient.StreamAsync(prompt, onEvent, cancellationToken);
             }
 
-            return _openAiClient.StreamQueryAsync(prompt, onEvent, cancellationToken, AuroraProviderSettings.LoadModel(AuroraAiProvider.OpenAI));
+            return _openAiClient.StreamQueryAsync(
+                prompt,
+                onEvent,
+                cancellationToken,
+                AuroraProviderSettings.LoadModel(AuroraAiProvider.OpenAI));
         }
 
         public async Task<string> GetStatusAsync()
@@ -312,6 +350,15 @@ namespace AuroraRevit.RevitAddin
 
         public static string LoadModel(AuroraAiProvider provider)
         {
+            var environmentName = provider == AuroraAiProvider.Ollama
+                ? "AURORA_OLLAMA_MODEL"
+                : "AURORA_OPENAI_MODEL";
+            var environment = Environment.GetEnvironmentVariable(environmentName);
+            if (!string.IsNullOrWhiteSpace(environment))
+            {
+                return environment.Trim();
+            }
+
             try
             {
                 var settings = ReadSettings();

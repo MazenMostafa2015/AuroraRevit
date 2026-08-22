@@ -56,6 +56,9 @@ def ollama_endpoint():
 
 
 def ollama_model():
+    value = os.environ.get("AURORA_OLLAMA_MODEL", "").strip()
+    if value:
+        return value
     value = str(_settings().get("ollama_model", "")).strip()
     if value:
         return value
